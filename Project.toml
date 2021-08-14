@@ -1,0 +1,13 @@
+name = "UncNLPTestSet"
+uuid = "ac41c6d5-581c-4fd8-9896-caf0766f302e"
+authors = ["Daniel Henderson dphender@mtu.edu"]
+version = "0.1.0"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]

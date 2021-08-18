@@ -16,81 +16,35 @@
 #    Number of variables MUST BE A MULTIPLE OF 5 (due to implemenatation)
 
 function POWER_f(x) 
-    γ = fx = 0.0
-    for i in firstindex(x):5:lastindex(x)
-        γ = x[i]*i
-        fx += γ*γ
-
-        γ = (i+1)*x[i+1]
-        fx += γ*γ
-
-        γ = (i+2)*x[i+2]
-        fx += γ*γ
-
-        γ = (i+3)*x[i+3]
-        fx += γ*γ
-
-        γ = (i+4)*x[i+4]
-        fx += γ*γ
+    fx = 0.0
+    for i in firstindex(x):lastindex(x)
+        α = x[i]*i
+        fx += α^2
     end
     return fx
 end
 
 function POWER_g!(x, g)
-    γ = 0.0
-    for i in firstindex(x):5:lastindex(x)
-        γ = x[i]*i
-        g[i] = 2.0*γ*i
-
-        γ = (i+1)*x[i+1]
-        g[i+1] = 2.0*γ*(i+1)
-
-        γ = (i+2)*x[i+2]
-        g[i+2] = 2.0*γ*(i+2)
-
-        γ = (i+3)*x[i+3]
-        g[i+3] = 2.0*γ*(i+3)
-
-        γ = (i+4)*x[i+4]
-        g[i+4] = 2.0*γ*(i+4)
+    for i in firstindex(x):lastindex(x)
+        α = x[i]*i^2
+        g[i] = 2.0α
     end
     return g
 end
 
 function POWER_fg!(x, g) 
-    γ = fx = 0.0
-    for i in firstindex(x):5:lastindex(x)
-        γ = i*x[i]
-        fx += γ^2
-        g[i] = 2.0*γ*i
-
-        γ = (i+1)*x[i+1]
-        fx += γ^2
-        g[i+1] = 2.0*γ*(i+1)
-
-        γ = (i+2)*x[i+2]
-        fx += γ^2
-        g[i+2] = 2.0*γ*(i+2)
-
-        γ = (i+3)*x[i+3]
-        fx += γ^2
-        g[i+3] = 2.0*γ*(i+3)
-
-        γ = (i+4)*x[i+4]
-        fx += γ^2
-        g[i+4] = 2.0*γ*(i+4)
+    fx = 0.0
+    for i in firstindex(x):lastindex(x)
+        α = x[i]*(i+1)
+        fx += α^2
+        g[i] = 2.0α*(i+1)
     end
     return fx, g
 end
 
 function POWER(n::Int=10000)
-    error("The Georgian implementation does not agree with CUTEst")
     @warn "Minimum not confirmed"
-    if (k = n % 5) != 0
-        n += 5 - k
-        @warn("The number of variables given in POWER(n::Int) must be a multiple of 5")
-        println("The number of variables has been updated to: $n")
-    end
+    error("CONFLICT: Gerogian's implemntation does not agree with SIF, but think they are right")
     return UncProgram("POWER", POWER_f, POWER_g!, POWER_fg!, n, ones(n), zeros(n))
 end
 

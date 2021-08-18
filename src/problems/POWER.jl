@@ -43,9 +43,8 @@ function POWER_fg!(x, g)
 end
 
 function POWER(n::Int=10000)
-    @warn "Minimum not confirmed"
     error("CONFLICT: Gerogian's implemntation does not agree with SIF, but think they are right")
-    return UncProgram("POWER", POWER_f, POWER_g!, POWER_fg!, n, ones(n), zeros(n))
+    return UncProgram("POWER", POWER_f, POWER_g!, POWER_fg!, n, ones(n))
 end
 
 export POWER

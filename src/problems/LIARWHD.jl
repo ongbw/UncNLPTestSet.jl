@@ -36,7 +36,6 @@ function LIARWHD_g!(x, g)
     return g
 end
 
-
 function LIARWHD_fg!(x, g)
     fx = 0.0
     for i in firstindex(x):lastindex(x)
@@ -50,8 +49,10 @@ function LIARWHD_fg!(x, g)
 end
 
 function LIARWHD(n::Int=5000)
-    @warn "Minimum not confirmed"
-    return UncProgram("LIARWHD", LIARWHD_f, LIARWHD_g!, LIARWHD_fg!, n, 4.0ones(n), ones(n))
+    return UncProgram("LIARWHD", LIARWHD_f, LIARWHD_g!, LIARWHD_fg!, n, 4.0ones(n))
 end
+
+nlp = LIARWHD()
+TestSet[nlp.name] = nlp
 
 export LIARWHD

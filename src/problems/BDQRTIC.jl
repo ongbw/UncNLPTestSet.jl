@@ -65,8 +65,8 @@ end
 
 
 function BDQRTIC(n::Int=5000)
-    @warn "minimum not confirmed" 
-    return UncProgram("BDQRTIC", BDQRTIC_f, BDQRTIC_g!, BDQRTIC_fg!, n, ones(n), zeros(n))
+    # error("ISSUES PREVAIL")
+    return UncProgram("BDQRTIC", BDQRTIC_f, BDQRTIC_g!, BDQRTIC_fg!, n, ones(n))
 end
 
 export BDQRTIC

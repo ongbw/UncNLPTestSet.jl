@@ -34,7 +34,10 @@ end
 
 function FLETCHCR(n::Int=1000)
     @warn "THERE IS SOME WEIRD STUFF, error in SIF or from Georgians"
-    return UncProgram("FLETCHCR", FLETCHCR_f, FLETCHCR_g!, FLETCHCR_fg!, n, zeros(n), zeros(n))
+    return UncProgram("FLETCHCR", FLETCHCR_f, FLETCHCR_g!, FLETCHCR_fg!, n)
 end
+
+# nlp = FLETCHCR()
+# TestSet[nlp.name] = nlp
 
 export FLETCHCR

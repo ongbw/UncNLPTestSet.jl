@@ -55,7 +55,10 @@ end
 
 
 function EXTROSNB(n::Int=1000)
-    return UncProgram("EXTROSNB", EXTROSNB_f, EXTROSNB_g!, EXTROSNB_fg!, n, -1.0ones(n), ones(n))
+    return UncProgram("EXTROSNB", EXTROSNB_f, EXTROSNB_g!, EXTROSNB_fg!, n, -1.0ones(n))
 end
+
+nlp = EXTROSNB()
+TestSet[nlp.name] = nlp
 
 export EXTROSNB

@@ -57,8 +57,10 @@ end
 
 
 function EG2(n::Int=1000)
-    @warn "Minimum not confirmed"
-    return UncProgram("EG2", EG2_f, EG2_g!, EG2_fg!, n, zeros(n), zeros(n))
+    return UncProgram("EG2", EG2_f, EG2_g!, EG2_fg!, n, zeros(n))
 end
+
+nlp = EG2()
+TestSet[nlp.name] = nlp
 
 export EG2

@@ -59,8 +59,7 @@ function CRAGGLVY(n::Int=5000)
     error("Issues")
     xint = 2*ones(5000)
     xint[1] = 1.0
-    @warn "x0 and minimum not confirmed"
-    return UncProgram("CRAGGLVY", CRAGGLVY_f, CRAGGLVY_g!, CRAGGLVY_fg!, n, xint, zeros(n) ) # NOT CONFIRMED
+    return UncProgram("CRAGGLVY", CRAGGLVY_f, CRAGGLVY_g!, CRAGGLVY_fg!, n, xint)
 end
 
 export CRAGGLVY

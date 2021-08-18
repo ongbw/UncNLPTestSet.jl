@@ -53,8 +53,10 @@ end
 
 # TODO
 function ENGVAL1(n::Int=5000)
-    @warn "Minimum not confirmed"
-    return UncProgram("ENGVAL1", ENGVAL1_f, ENGVAL1_g!, ENGVAL1_fg!, n, 2.0*ones(n), zeros(n) )
+    return UncProgram("ENGVAL1", ENGVAL1_f, ENGVAL1_g!, ENGVAL1_fg!, n, 2.0*ones(n))
 end
+
+nlp = ENGVAL1()
+TestSet[nlp.name] = nlp
 
 export ENGVAL1

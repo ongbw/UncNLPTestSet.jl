@@ -45,8 +45,10 @@ end
 
 # TODO: Set up initial conditions 
 function COSINE(n::Int=10000)
-    @warn "Minimum not confirmed"
-    return UncProgram("COSINE", COSINE_f, COSINE_g!, COSINE_fg!, n, ones(n), zeros(n))
+    return UncProgram("COSINE", COSINE_f, COSINE_g!, COSINE_fg!, n, ones(n))
 end
+
+nlp = COSINE()
+TestSet[nlp.name] = nlp
 
 export COSINE

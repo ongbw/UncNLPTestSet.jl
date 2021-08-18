@@ -33,5 +33,5 @@ end
 
 function LANGER(n::Int=25)
     @warn "x0 and minimum not confirmed"
-    return UncProgram("LANGER", LANGER_f, LANGER_g!, LANGER_fg!, n, zeros(n), zeros(n))
+    return UncProgram("LANGER", LANGER_f, LANGER_g!, LANGER_fg!, n)
 end

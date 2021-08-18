@@ -28,7 +28,7 @@ end
 function ARWHEAD_g!(x, g)
     gn = 0.0
     cxn = 4.0*x[lastindex(x)]
-    xn_sqr = xn^2/16.0
+    xn_sqr = cxn^2/16.0
     for i in firstindex(x):lastindex(x)-1
         α = x[i]^2 + xn_sqr
         g[i] = 4.0x[i]*α - 4.0
@@ -41,7 +41,7 @@ end
 function ARWHEAD_fg!(x, g) 
     gn = fx = 0.0
     cxn = 4.0*x[lastindex(x)]
-    xn_sqr = xn^2/4.0
+    xn_sqr = cxn^2/16.0
     for i in firstindex(x):lastindex(x)-1
         α = x[i]^2 + xn_sqr
         fx += (x[i]^2 + xn_sqr)^2 + 3.0 - 4.0*x[i]
@@ -53,8 +53,10 @@ function ARWHEAD_fg!(x, g)
 end
 
 function ARWHEAD(n::Int=5000)
-    @warn "minimum not confirmed"
-    return UncProgram("ARWHEAD", ARWHEAD_f, ARWHEAD_g!, ARWHEAD_fg!, n, ones(n), zeros(n))
+    return UncProgram("ARWHEAD", ARWHEAD_f, ARWHEAD_g!, ARWHEAD_fg!, n, ones(n))
 end
+
+nlp = ARWHEAD()
+TestSet[nlp.name] = nlp
 
 export ARWHEAD

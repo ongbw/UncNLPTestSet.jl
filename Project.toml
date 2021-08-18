@@ -3,11 +3,12 @@ uuid = "ac41c6d5-581c-4fd8-9896-caf0766f302e"
 authors = ["Daniel Henderson dphender@mtu.edu"]
 version = "0.1.0"
 
-[compat]
-julia = "1"
+[deps]
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+CUTEst = "1b53aba6-35b6-5f92-a507-53c67d53f819"
 
-[extras]
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+[compat]
+julia = "^1.3.0"
 
 [targets]
 test = ["Test"]

@@ -16,7 +16,7 @@ julia> Pkg.add(url="https://github.com/danphenderson/UncNLPTestSet.jl")
 julia> using UncNLPTestSet.jl
 ```
 
-Until a stable version has been released, it is best to regularly update your version of the package after you declaration:
+Until a stable version has been released, when ```julia using UncNLPTestSet``` it is best to first update your version of the package:
 
 ```julia
 julia> Pkg.update("UncNLPTestSet.jl")

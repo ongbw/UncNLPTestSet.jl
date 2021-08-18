@@ -66,7 +66,7 @@ end
 
 TestSet = Dict{AbstractString, UncProgram}()
 # place problems in module
-for p in readdir("src/problems")
+for p in readdir(joinpath(@__DIR__, "problems"))
     include(joinpath("problems", p))
 end
 

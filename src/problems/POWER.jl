@@ -26,7 +26,7 @@ end
 
 function POWER_g!(x, g)
     for i in firstindex(x):lastindex(x)
-        α = x[i]*i^2
+        α = x[i]*i
         g[i] = 2.0α
     end
     return g
@@ -35,15 +35,15 @@ end
 function POWER_fg!(x, g) 
     fx = 0.0
     for i in firstindex(x):lastindex(x)
-        α = x[i]*(i+1)
+        α = x[i]*i
         fx += α^2
-        g[i] = 2.0α*(i+1)
+        g[i] = 2.0α*i
     end
     return fx, g
 end
 
 function POWER(n::Int=10000)
-    error("CONFLICT: Gerogian's implemntation does not agree with SIF, but think they are right")
+    #error("CONFLICT: Gerogian's implemntation does not agree with SIF, but think they are right")
     return UncProgram("POWER", POWER_f, POWER_g!, POWER_fg!, n, ones(n))
 end
 

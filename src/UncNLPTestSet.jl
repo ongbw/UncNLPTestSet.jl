@@ -30,42 +30,26 @@ struct UncProgram
     min::AbstractVector{<:Real}
 end
 
-
 function obj(nlp::UncProgram, x::AbstractVector{<:Real})
     return nlp.f(x)
 end
 
-
 function grad(nlp::UncProgram, x::AbstractVector{<:Real})
     @lencheck nlp.n x
-    g = copy(x)
-    return nlp.g!(g)
-end
-
-function grad!(nlp::UncProgram, x::AbstractVector{<:Real})
-    @lencheck nlp.n x
-    return nlp.g!(x)
+    g = zeros(length(x))
+    return nlp.g!(x, g)
 end
 
 function obj_grad(nlp::UncProgram, x::AbstractVector{<:Real})
     @lencheck nlp.n x
-    # todo, if a convient formula exists call it
-    # else we just compute: return obj(nlp, x), grad(nl, x)
-    g = copy(x)
-    return nlp.fg!(x)
-end
-
-function obj_grad!(nlp::UncProgram, x::AbstractVector{<:Real})
-    @lencheck nlp.n x
-    # todo, if a convient formula exists call it
-    # else we just compute: return obj(nlp, x), grad(nl, x)
-    return nlp.fg!(x)
+    g = zeros(length(x)) # similar does not work?
+    return nlp.fg!(x, g)
 end
 
 for p in readdir("src/problems")
     include(joinpath("problems", p))
 end
 
-export obj, grad, grad!, obj_grad, obj_grad!
+export obj, grad, obj_grad
 
 end # module UncNLPTestSet

@@ -26,35 +26,33 @@ function EDENSCH_f(x)
     return fx
 end
 
-function EDENSCH_g!(x)
+function EDENSCH_g!(x, g)
     for i in firstindex(x):lastindex(x)-1
-        item1 = x[i] - 2
-        item2 = x[i]x[i+1] - 2.0x[i+1]
-        item3 = x[i+1] + 1
-        g[i] += 4.0item1^3 + 2.0item2x[i+1]
-        g[i+1] += 2.0item2(x[i] - 2.0) + 2.0item3
+        item1 = x[i] - 2.0
+        item2 = x[i]*x[i+1] - 2.0*x[i+1]
+        item3 = x[i+1] + 1.0
+        g[i] += 4.0*item1^3 + 2.0*item2*x[i+1]
+        g[i+1] += 2.0*item2*(x[i] - 2.0) + 2.0*item3
     end
     return g
 end
 
-# TODO: Late, might be an issue with in-place operation conversion...  
-function EDENSCH_fg!(x)
+function EDENSCH_fg!(x, g)
     fx = 0.0 
-    g = zeros(length(x))
     for i in firstindex(x):lastindex(x)-1
-        item1 = x[i] - 2
-        item2 = x[i]x[i+1] - 2.0x[i+1]
-        item3 = x[i+1] + 1
-        fx += 16 + item1^4 + item2^2 + item3^2
-        g[i] += 4.0item1^3 + 2.0item2x[i+1]
-        g[i+1] += 2.0item2(x[i] - 2.0) + 2.0item3
+        item1 = x[i] - 2.0
+        item2 = x[i]*x[i+1] - 2.0*x[i+1]
+        item3 = x[i+1] + 1.0
+        fx += 16.0 + item1^4 + item2^2 + item3^2
+        g[i] += 4.0*item1^3 + 2.0*item2*x[i+1]
+        g[i+1] += 2.0*item2*(x[i] - 2.0) + 2.0*item3
     end
     return fx, g
 end
 
 function EDENSCH(n::Int=2000)
-    @warn "x0 and minimum not confirmed"
-    return UncProgram("EDENSCH", EDENSCH_f, EDENSCH_g!, EDENSCH_fg!, n, zeros(n), zeros(n))
+    @warn "Minimum not confirmed"
+    return UncProgram("EDENSCH", EDENSCH_f, EDENSCH_g!, EDENSCH_fg!, n, 8.0ones(n), zeros(n))
 end
 
 export EDENSCH

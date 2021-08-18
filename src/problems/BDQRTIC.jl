@@ -27,16 +27,13 @@ function BDQRTIC_f(x)
     return fx
 end
 
-# TODO: This is an instance where an in-place operation would be very bad..
-#       fix current implementation when it becomes more clear..  
-function BDQRTIC_g!(x)
-    g = zeros(length(x))
+function BDQRTIC_g!(x, g)
     xn = x[lastindex(x)]
-    xn_sqr = xn^2
+    cxn_sqr = 5.0xn^2
     gn = 0.0
     for i in firstindex(x):lastindex(x)-4
         α = 3.0 - 4.0x[i]
-        γ = x[i]^2 + 2.0x[i+1]^2 + 3.0x[i+2]^2 + 4.0x[i+3]^2 + 5.0xn_sqr
+        γ = x[i]^2 + 2.0x[i+1]^2 + 3.0x[i+2]^2 + 4.0x[i+3]^2 + cxn_sqr
         g[i] += -8.0α + 4.0γ*x[i];
         g[i+1] += 8.0γ*x[i+1];
         g[i+2] += 12.0γ*x[i+2];
@@ -47,17 +44,14 @@ function BDQRTIC_g!(x)
     return g
 end
 
-# TODO: This is an instance where an in-place operation would be very bad..
-#       fix current implementation when it becomes more clear..  
-function BDQRTIC_fg!(x)
+function BDQRTIC_fg!(x, g)
     fx = 0.0 
-    g = zeros(length(x))
     xn = x[lastindex(x)]
-    xn_sqr = xn^2
+    cxn_sqr = xn^2
     gn = 0.0
     for i in firstindex(x):lastindex(x)-4
         α = 3.0 - 4.0x[i]
-        γ = x[i]^2 + 2.0x[i+1]^2 + 3.0x[i+2]^2 + 4.0x[i+3]^2 + 5.0xn_sqr
+        γ = x[i]^2 + 2.0x[i+1]^2 + 3.0x[i+2]^2 + 4.0x[i+3]^2 + cxn_sqr
         fx += α*γ + γ^2
         g[i] += -8.0α + 4.0γ*x[i];
         g[i+1] += 8.0γ*x[i+1];
@@ -66,12 +60,12 @@ function BDQRTIC_fg!(x)
         gn += 20.0γ*xn;
     end
     g[lastindex(x)] = gn
-    return g, fx
+    return fx, g
 end
 
 
 function BDQRTIC(n::Int=5000)
-    @warn "minimum not confirmed & Instance of a grad call making a redundant copy of x" 
+    @warn "minimum not confirmed" 
     return UncProgram("BDQRTIC", BDQRTIC_f, BDQRTIC_g!, BDQRTIC_fg!, n, ones(n), zeros(n))
 end
 

@@ -16,76 +16,82 @@
 #    Number of variables MUST BE A MULTIPLE OF 5 (due to implemenatation)
 
 function POWER_f(x) 
-    item = fx = 0.0
+    γ = fx = 0.0
     for i in firstindex(x):5:lastindex(x)
-        item = x[i]*i
-        fx += item*item
+        γ = x[i]*i
+        fx += γ*γ
 
-        item = (i+1)*x[i+1]
-        fx += item*item
+        γ = (i+1)*x[i+1]
+        fx += γ*γ
 
-        item = (i+2)*x[i+2]
-        fx += item*item
+        γ = (i+2)*x[i+2]
+        fx += γ*γ
 
-        item = (i+3)*x[i+3]
-        fx += item*item
+        γ = (i+3)*x[i+3]
+        fx += γ*γ
 
-        item = (i+4)*x[i+4]
-        fx += item*item
+        γ = (i+4)*x[i+4]
+        fx += γ*γ
     end
     return fx
 end
 
-function POWER_g!(x)
-    item = 0.0
+function POWER_g!(x, g)
+    γ = 0.0
     for i in firstindex(x):5:lastindex(x)
-        item = x[i]*i
-        x[i] = 2.0*item*i
+        γ = x[i]*i
+        g[i] = 2.0*γ*i
 
-        item = (i+1)*x[i+1]
-        x[i+1] = 2.0*item*(i+1)
+        γ = (i+1)*x[i+1]
+        g[i+1] = 2.0*γ*(i+1)
 
-        item = (i+2)*x[i+2]
-        x[i+2] = 2.0*item*(i+2)
+        γ = (i+2)*x[i+2]
+        g[i+2] = 2.0*γ*(i+2)
 
-        item = (i+3)*x[i+3]
-        x[i+3] = 2.0*item*(i+3)
+        γ = (i+3)*x[i+3]
+        g[i+3] = 2.0*γ*(i+3)
 
-        item = (i+4)*x[i+4]
-        x[i+4] = 2.0*item*(i+4)
+        γ = (i+4)*x[i+4]
+        g[i+4] = 2.0*γ*(i+4)
     end
+    return g
 end
 
-function POWER_fg!(x) 
-    item = fx = 0.0
+function POWER_fg!(x, g) 
+    γ = fx = 0.0
     for i in firstindex(x):5:lastindex(x)
-        item = x[i]*i
-        fx += item*item
-        x[i] = 2.0*item*i
+        γ = i*x[i]
+        fx += γ^2
+        g[i] = 2.0*γ*i
 
-        item = (i+1)*x[i+1]
-        fx += item*item
-        x[i+1] = 2.0*item*(i+1)
+        γ = (i+1)*x[i+1]
+        fx += γ^2
+        g[i+1] = 2.0*γ*(i+1)
 
-        item = (i+2)*x[i+2]
-        fx += item*item
-        x[i+2] = 2.0*item*(i+2)
+        γ = (i+2)*x[i+2]
+        fx += γ^2
+        g[i+2] = 2.0*γ*(i+2)
 
-        item = (i+3)*x[i+3]
-        fx += item*item
-        x[i+3] = 2.0*item*(i+3)
+        γ = (i+3)*x[i+3]
+        fx += γ^2
+        g[i+3] = 2.0*γ*(i+3)
 
-        item = (i+4)*x[i+4]
-        fx += item*item
-        x[i+4] = 2.0*item*(i+4)
+        γ = (i+4)*x[i+4]
+        fx += γ^2
+        g[i+4] = 2.0*γ*(i+4)
     end
-    return fx, x
+    return fx, g
 end
 
-# TODO: Determine an n and a good starting point/min
-function POWER(n::Int=25)
-    @warn "x0 and minimum not confirmed"
-    return UncProgram("POWER", POWER_f, POWER_g!, POWER_fg!, n, zeros(n), zeros(n))
+function POWER(n::Int=10000)
+    error("The Georgian implementation does not agree with CUTEst")
+    @warn "Minimum not confirmed"
+    if (k = n % 5) != 0
+        n += 5 - k
+        @warn("The number of variables given in POWER(n::Int) must be a multiple of 5")
+        println("The number of variables has been updated to: $n")
+    end
+    return UncProgram("POWER", POWER_f, POWER_g!, POWER_fg!, n, ones(n), zeros(n))
 end
 
 export POWER

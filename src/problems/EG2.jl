@@ -19,42 +19,45 @@
 
 function EG2_f(x) 
     fx = 0.0 
+    α = x[1] - 1.0
     for i in firstindex(x):lastindex(x)-1
-        item = x[0] + x[i]^2 - 1
-        fx += sin(item)
+        γ = α + x[i]^2
+        fx += sin(γ)
     end
     return fx
 end
 
 
-function EG2_g!(x)
-    g = zeros(length(x))
-    g[length(x)] = cos(x[n]^2)x[n]
+function EG2_g!(x, g)
+    α = x[1] - 1
+    xn = x[lastindex(x)] 
+    g[lastindex(x)] = cos(xn^2)xn
     for i in firstindex(x):lastindex(x)-1
-        item = x[0] + x[i]^2 - 1
-        g[1] += cos(item)
-        g[i] += 2.0cos(item)x[i]
+        γ = α + x[i]^2
+        g[1] += cos(γ)
+        g[i] += 2.0cos(γ)x[i]
     end
     return g
 end
 
 
-function EG2_fg!(x)
-    fx = 0.0 
-    g = zeros(length(x))
-    g[length(x)] = cos(x[n]^2)x[n]
+function EG2_fg!(x, g)
+    fx = 0.0
+    α = x[1] - 1.0
+    xn = x[lastindex(x)] 
+    g[lastindex(x)] = cos(xn^2)xn
     for i in firstindex(x):lastindex(x)-1
-        item = x[0] + x[i]^2 - 1
-        fx += sin(item)
-        g[1] += cos(item)
-        g[i] += 2.0cos(item)x[i]
+        γ = α + x[i]^2
+        fx += sin(γ)
+        g[1] += cos(γ)
+        g[i] += 2.0cos(γ)x[i]
     end
     return fx, g
 end
 
 
 function EG2(n::Int=1000)
-    @warn "x0 and minimum not confirmed"
+    @warn "Minimum not confirmed"
     return UncProgram("EG2", EG2_f, EG2_g!, EG2_fg!, n, zeros(n), zeros(n))
 end
 

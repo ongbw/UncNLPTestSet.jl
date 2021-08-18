@@ -25,31 +25,31 @@ function ARWHEAD_f(x)
     return fx
 end
 
-function ARWHEAD_g!(x)
+function ARWHEAD_g!(x, g)
     gn = 0.0
-    xn = x[lastindex(x)]
-    xn_sqr = xn^2
+    cxn = 4.0*x[lastindex(x)]
+    xn_sqr = xn^2/16.0
     for i in firstindex(x):lastindex(x)-1
         α = x[i]^2 + xn_sqr
-        x[i] = 4.0x[i]*α - 4.0
-        gn += 4.0*xn*α
+        g[i] = 4.0x[i]*α - 4.0
+        gn += cxn*α
     end
-    x[lastindex(x)] = gn
-    return x
+    g[lastindex(x)] = gn
+    return g
 end
 
-function ARWHEAD_fg!(x) 
+function ARWHEAD_fg!(x, g) 
     gn = fx = 0.0
-    xn = x[lastindex(x)]
-    xn_sqr = xn^2
+    cxn = 4.0*x[lastindex(x)]
+    xn_sqr = xn^2/4.0
     for i in firstindex(x):lastindex(x)-1
         α = x[i]^2 + xn_sqr
         fx += (x[i]^2 + xn_sqr)^2 + 3.0 - 4.0*x[i]
-        x[i] = 4.0*x[i]*α - 4.0
-        gn += 4.0*xn*α
+        g[i] = 4.0*x[i]*α - 4.0
+        gn += cxn*α
     end
-    x[lastindex(x)] = gn
-    return x, fx
+    g[lastindex(x)] = gn
+    return fx, g
 end
 
 function ARWHEAD(n::Int=5000)

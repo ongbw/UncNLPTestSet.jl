@@ -23,39 +23,37 @@
 function ENGVAL1_f(x) 
     fx = 0.0 
     for i in firstindex(x):lastindex(x)-1
-        item = x[i]^2 + x[i+1]^2
-        fx += item^2 + (3 - 4.0x[i])
+        γ = x[i]^2 + x[i+1]^2
+        fx += γ^2 + (3.0 - 4.0x[i])
     end
     return fx
 end
 
 
-function ENGVAL1_g!(x)
-    g = zeros(length(x))
+function ENGVAL1_g!(x, g)
     for i in firstindex(x):lastindex(x)-1
-        item = x[i]^2 + x[i+1]^2
-        g[i] += 4.0item*x[i] - 4.0
-        g[i+1] += 4.0item*x[i+1]
+        γ = x[i]^2 + x[i+1]^2
+        g[i] += 4.0γ*x[i] - 4.0
+        g[i+1] += 4.0γ*x[i+1]
     end
     return g
 end
 
 # TODO: Late, might be an issue with in-place operation conversion...  
-function ENGVAL1_fg!(x)
+function ENGVAL1_fg!(x, g)
     fx = 0.0 
-    g = zeros(length(x))
     for i in firstindex(x):lastindex(x)-1
-        item = x[i]^2 + x[i+1]^2
-        fx += item^2 + (3 - 4.0x[i])
-        g[i] += 4.0item*x[i] - 4.0
-        g[i+1] += 4.0item*x[i+1]
+        γ = x[i]^2 + x[i+1]^2
+        fx += γ^2 + (3.0 - 4.0x[i])
+        g[i] += 4.0γ*x[i] - 4.0
+        g[i+1] += 4.0γ*x[i+1]
     end
     return fx, g
 end
 
 # TODO
 function ENGVAL1(n::Int=5000)
-    @warn "x0 and minimum not confirmed"
+    @warn "Minimum not confirmed"
     return UncProgram("ENGVAL1", ENGVAL1_f, ENGVAL1_g!, ENGVAL1_fg!, n, 2.0*ones(n), zeros(n) )
 end
 

@@ -63,10 +63,4 @@ function BDQRTIC_fg!(x, g)
     return fx, g
 end
 
-
-function BDQRTIC(n::Int=5000)
-    # error("ISSUES PREVAIL")
-    return UncProgram("BDQRTIC", BDQRTIC_f, BDQRTIC_g!, BDQRTIC_fg!, n, ones(n))
-end
-
-export BDQRTIC
+# TestSet["BDQRTIC"] = UncProgram("BDQRTIC", BDQRTIC_f, BDQRTIC_g!, BDQRTIC_fg!, 5000, ones(5000))

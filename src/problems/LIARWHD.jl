@@ -25,8 +25,7 @@ function LIARWHD_f(x)
     return fx
 end
 
-
-function LIARWHD_g!(x, g)
+function  LIARWHD_g!(x, g)
     for i in firstindex(x):lastindex(x)
         α = 2.0(x[i]^2 - x[1])
         γ = x[i]-1
@@ -48,11 +47,4 @@ function LIARWHD_fg!(x, g)
     return fx, g
 end
 
-function LIARWHD(n::Int=5000)
-    return UncProgram("LIARWHD", LIARWHD_f, LIARWHD_g!, LIARWHD_fg!, n, 4.0ones(n))
-end
-
-nlp = LIARWHD()
-TestSet[nlp.name] = nlp
-
-export LIARWHD
+TestSet["LIARWHD"] = UncProgram("LIARWHD", LIARWHD_f, LIARWHD_g!, LIARWHD_fg!, 5000, 4ones(5000))

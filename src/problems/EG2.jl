@@ -40,7 +40,6 @@ function EG2_g!(x, g)
     return g
 end
 
-
 function EG2_fg!(x, g)
     fx = 0.0
     α = x[1] - 1.0
@@ -55,12 +54,4 @@ function EG2_fg!(x, g)
     return fx, g
 end
 
-
-function EG2(n::Int=1000)
-    return UncProgram("EG2", EG2_f, EG2_g!, EG2_fg!, n, zeros(n))
-end
-
-nlp = EG2()
-TestSet[nlp.name] = nlp
-
-export EG2
+TestSet["EG2"] = UncProgram("EG2", EG2_f, EG2_g!, EG2_fg!, 1000, zeros(1000))

@@ -11,6 +11,7 @@
 #    COSINE.SIF classification OUR2-AN-V-0
 #
 #    Number of variables (variable)
+
 function COSINE_f(x) 
     fx = 0.0
     for i in firstindex(x):lastindex(x)-1
@@ -20,7 +21,6 @@ function COSINE_f(x)
     return fx
 end
 
-# TODO: Late, might be an issue with in-place operation conversion...  
 function COSINE_g!(x, g)
     for i in firstindex(x):lastindex(x)-1
         α = -0.5x[i+1]+x[i]^2
@@ -29,8 +29,7 @@ function COSINE_g!(x, g)
     end
     return g
 end
-
-# TODO: Late, might be an issue with in-place operation conversion...  
+ 
 function COSINE_fg!(x, g)
     fx = 0.0 
     for i in firstindex(x):lastindex(x)-1
@@ -42,13 +41,4 @@ function COSINE_fg!(x, g)
     return fx, g
 end
 
-
-# TODO: Set up initial conditions 
-function COSINE(n::Int=10000)
-    return UncProgram("COSINE", COSINE_f, COSINE_g!, COSINE_fg!, n, ones(n))
-end
-
-nlp = COSINE()
-TestSet[nlp.name] = nlp
-
-export COSINE
+TestSet["COSINE"] = UncProgram("COSINE", COSINE_f, COSINE_g!, COSINE_fg!, 10000, ones(10000))

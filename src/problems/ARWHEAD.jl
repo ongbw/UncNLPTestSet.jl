@@ -52,11 +52,4 @@ function ARWHEAD_fg!(x, g)
     return fx, g
 end
 
-function ARWHEAD(n::Int=5000)
-    return UncProgram("ARWHEAD", ARWHEAD_f, ARWHEAD_g!, ARWHEAD_fg!, n, ones(n))
-end
-
-nlp = ARWHEAD()
-TestSet[nlp.name] = nlp
-
-export ARWHEAD
+TestSet["ARWHEAD"] = UncProgram("ARWHEAD", ARWHEAD_f, ARWHEAD_g!, ARWHEAD_fg!, 5000, ones(5000))

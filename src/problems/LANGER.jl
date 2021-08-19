@@ -18,20 +18,16 @@
 #
 #   N is the number of free variables, and should be a multiple of 4
 
-function LANGER_f(x) 
-    return error("objective not defined")
+f = (x) -> begin  
+    return error("LANGER.jl not implemented")
 end
 
-function LANGER_g!(x)
-    return error("gradient not defined")
+g! = (x, g) -> begin  
+    return error("LANGER.jl not implemented")
 end
 
-function LANGER_fg!(x) 
-    return error("gradient not defined")
+fg! = (x, g) -> begin  
+    return error("LANGER.jl not implemented")
 end
 
-
-function LANGER(n::Int=25)
-    @warn "x0 and minimum not confirmed"
-    return UncProgram("LANGER", LANGER_f, LANGER_g!, LANGER_fg!, n)
-end
+# TestSet["LANGER"] = UncProgram("LANGER", f, g!, fg!, 25, zeros(25))

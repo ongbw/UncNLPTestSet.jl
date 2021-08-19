@@ -19,8 +19,9 @@
 #    ENGVAL1.SIF classification OUR2-AN-V-0
 #
 #    N is the number of variables
+let 
 
-function ENGVAL1_f(x) 
+function f(x) 
     fx = 0.0 
     for i in firstindex(x):lastindex(x)-1
         γ = x[i]^2 + x[i+1]^2
@@ -29,8 +30,7 @@ function ENGVAL1_f(x)
     return fx
 end
 
-
-function ENGVAL1_g!(x, g)
+function g!(x, g)
     for i in firstindex(x):lastindex(x)-1
         γ = x[i]^2 + x[i+1]^2
         g[i] += 4.0γ*x[i] - 4.0
@@ -39,8 +39,7 @@ function ENGVAL1_g!(x, g)
     return g
 end
 
-# TODO: Late, might be an issue with in-place operation conversion...  
-function ENGVAL1_fg!(x, g)
+function fg!(x, g)
     fx = 0.0 
     for i in firstindex(x):lastindex(x)-1
         γ = x[i]^2 + x[i+1]^2
@@ -51,12 +50,6 @@ function ENGVAL1_fg!(x, g)
     return fx, g
 end
 
-# TODO
-function ENGVAL1(n::Int=5000)
-    return UncProgram("ENGVAL1", ENGVAL1_f, ENGVAL1_g!, ENGVAL1_fg!, n, 2.0*ones(n))
-end
+TestSet["ENGVAL1"] = UncProgram("ENGVAL1", f, g!, fg!, 5000, 2.0*ones(5000))
 
-nlp = ENGVAL1()
-TestSet[nlp.name] = nlp
-
-export ENGVAL1
+end # end of local scope

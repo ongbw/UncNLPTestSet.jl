@@ -8,7 +8,6 @@
 #    Groups N+1 to M-1 use 1 nonlinear element.
 #    Group M uses N nonlinear elements.
 #    The Hessian matrix is dense.
-
 #
 #    Origonal SIF Source: Problem 24 in
 #    J.J. More', B.S. Garbow and K.E. Hillstrom,
@@ -17,67 +16,58 @@
 #
 #    See also Buckley#112 (p. 80)
 #
-#    Implementation translated from Source:
-#    http://eprints.tsu.ge/234/14/Tests%20collection-K-F.pdf
-#
 #    PENALTY2.SIF classification SUR2-AN-V-0
 #
-#    Number of variables is variable
+#    Number of variables is variable (n>3)
+#
+# Daniel Henderson, 08/2021   
 
 function PENALTY2_f(x)
-	a 	  = 1e-5
-	fx    = (x[1]-0.2)^2
-	tail  = x[1]^2*(n-1)
-	for i in firstindex(x)+1:lastindex(x)
-		item1 = exp(x[i]/10) + exp(x[i-1]/10) - exp(i/10.0)-exp((i-1)/10.0)
-		item2 = exp(x[i]/10) -exp(-1/10.0)
-		fx   += (item1^2 + item2^2)a
-		tail   += (n-i-1)x[i]^2
+	@warn "PENALTY2.jl doesn't agree with CUTEst or a JuMP (all three conflict)"
+	N  = lastindex(x)
+	fx = (x[1]-0.2)^2
+	a  = 1e-5
+	y  = ones(2*N)
+
+  	for i in 1:2*N
+    	y[i] = exp(i / 10.0) + exp((i - 1) / 10.0)
+  	end
+
+	α  = N*x[1]^2-1
+	
+	for i in 2:N
+		fx += a*(exp(x[i]/10)+exp(x[i-1]/10) - y[i])^2
+		fx += a*(exp(x[i]/10)-exp(-1/10))^2
+		α += (N-i+1)*x[i]^2 - 1
 	end
-	fx += (tail - 0.25)^4
-    return fx
+	
+	fx += α^2
+	return fx
 end
 
+# check chain rule use on product of sum term 
 function PENALTY2_g!(x, g)
-	n     = length(x)
-	a 	  = 1e-5
-	item1 = x[1]-0.2
-	g[1]  = 2item1
-	tail += x[1]^2*n
-	for i in firstindex(x)+1:lastindex(x)
-		item1 = exp(x[i]/10) + exp(x[i-1]/10) - exp(i/10.0)-exp((i-1)/10.0)
-		item2   = exp(x[i]/10) -exp(-1/10.0)
-		tail   += (n-i-1)x[i]^2
-		g[i-1] += 0.2a*exp(x[i-1]/10)item1
-		g[i]   += 0.2a*exp(x[i]/10)(item1 + item2)
+    N  = lastindex(x)
+	γ  = (1e-5)/5
+	α  = N*x[1]^2-1
+
+	g[1] = 2*(x[1]-0.2)*x[1]
+	for i in 2:N
+		g[i-1] += γ*exp(x[i-1]/10) * (exp(x[i]/10) + exp(x[i-1]/10) - exp((i+1)/10) - exp(i/10) )
+		g[i]   -= γ*exp(x[i]/10) * (exp(1/10) + exp(i/10) + exp((i+1)/10) - exp(x[i-1]/10) - 2*exp(x[i]/10))
+		α      += (N-i+1)*x[i]^2 - 1
 	end
-	for i in firstindex(x):lastindex(x)
-		g[i] += 4(tail - 0.25)x[i]
+		α *= 2 # diff of outer function 
+	for i in 2:N
+		g[i] += α * 2*(N-i+1)*x[i] 
 	end
-    return g
+	return g
 end
+
 
 function PENALTY2_fg!(x, g)
-	n     = length(x)
-	a 	  = 1e-5
-	item1 = x[1]-0.2
-	fx    = item1^2
-	g[1]  = 2item1
-	tail += x[1]^2*(n-1)
-	for i in firstindex(x)+1:lastindex(x)
-		item1 = exp(x[i]/10) + exp(x[i-1]/10) - exp(i/10.0)-exp((i-1)/10.0)
-		item2   = exp(x[i]/10) -exp(-1/10.0)
-		tail   += (n-i-1)x[i]^2
-		fx     += (item1^2 + item2^2)a
-		g[i-1] += 0.2a*exp(x[i-1]/10)item1
-		g[i]   += 0.2a*exp(x[i]/10)(item1 + item2)
-	end
-	fx += (tail - 0.25)^4
-	for i in firstindex(x):lastindex(x)
-		g[i] += 4(tail - 0.25)x[i]
-	end
-    return fx, g
+    return error("PENALTY2 fg! not implmented")
 end
 
-
-TestSet["PENALTY2"] = UncProgram("PENALTY2", PENALTY2_f, PENALTY2_g!, PENALTY2_fg!, 100, 0.5ones(100))
+#@warn "PENALTY2 dimensions must be greater than 3."
+#TestSet["PENALTY2"] = UncProgram("PENALTY2", PENALTY2_f, PENALTY2_g!, PENALTY2_fg!, 200, 0.5ones(200))

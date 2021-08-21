@@ -11,6 +11,8 @@
 #    QUARTC.SIF classification OUR2-AN-V-0
 #
 #    Number of variables is variable
+#
+# Daniel Henderson, 08/2021   
 
 function QUARTC_f(x)
 	fx = 0.0
@@ -36,4 +38,4 @@ function QUARTC_fg!(x, g)
     return fx, g
 end
 
-TestSet["QUARTC"] = UncProgram("QUARTC", QUARTC_f, QUARTC_g!, QUARTC_fg!, 10000, 2ones(10000))
+TestSet["QUARTC"] = UncProgram("QUARTC", QUARTC_f, QUARTC_g!, QUARTC_fg!, 5000, 2ones(5000))

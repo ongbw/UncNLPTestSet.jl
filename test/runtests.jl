@@ -7,8 +7,8 @@ for nlp ∈ values(TestSet)
     qt_x0  = qt_nlp.meta.x0
 
     try
-        @test norm(obj(nlp, nlp.x0) - jo.obj(qt_nlp, nlp.x0)) < 10e-4
-        @test norm(grad(nlp, nlp.x0) - jo.grad(qt_nlp, nlp.x0)) < 10e-4
+        @test abs(obj(nlp, nlp.x0) ≈ jo.obj(qt_nlp, nlp.x0))
+        @test grad(nlp, nlp.x0) ≈ jo.grad(qt_nlp, nlp.x0)
     catch e
         println(e)
     end

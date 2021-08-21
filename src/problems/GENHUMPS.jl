@@ -9,45 +9,46 @@
 #    Origonal SIF Source:
 #    Ph. Toint, private communication, 1997
 #
-#    Implementation translated from Source:
-#    http://eprints.tsu.ge/234/14/Tests%20collection-K-F.pdf
-#
 #    GENHUMP.SIF classification OUR2-AN-V-0
 #
 #    Number of variables is variable
+#
+# Daniel Henderson, 08/2021  
 
 function GENHUMP_f(x) 
 	fx = 0.0
+    ζ = 20.0
     for i in firstindex(x):lastindex(x)-1
-        item1   = sin(2.0*x[i])
-		item2   = sin(2.0*x[i+1])
-		fx     += item1^2item2^2 + 0.05(x[i]^2+x[i+1]^2)
+        fx += sin(ζ*x[i])^2*sin(ζ*x[i+1])^2+0.05*(x[i]^2+x[i+1]^2)
     end
     return fx
 end
 
 function GENHUMP_g!(x, g)
-    for i in firstindex(x):lastindex(x)-1
-        item1   = sin(2.0*x[i])
-		item2   = sin(2.0*x[i+1])
-		g[i]   += 4item1*cos(2x[i])item2^2 + 0.1x[i]
-		g[i+1] += 4.0*item2*cos(2.0*x[i+1])*item1*item1 + 0.1*x[i+1]
+    ζ = 20.0
+    n = lastindex(x)
+
+    g[1] = ζ*sin(2ζ*x[1])*sin(ζ*x[2])^2+0.1x[1]
+    for i in 1:n-2
+        g[i+1] = 0.2x[i+1]+40cos(20x[i+1])sin(20x[i])^2*sin(20x[i+1])+40cos(20x[i+1])sin(20x[i+1])sin(20x[i+2])^2
     end
+    g[n] = 2ζ*cos(ζ*x[n])*sin(ζ*x[n-1])^2*sin(ζ*x[n])+0.1x[n]
     return g
 end
 
 function GENHUMP_fg!(x, g) 
-	fx = 0.0
-    for i in firstindex(x):lastindex(x)-1
-        item1   = sin(2.0*x[i])
-		item2   = sin(2.0*x[i+1])
-		fx     += item1^2item2^2 + 0.05(x[i]^2+x[i+1]^2)
-		g[i]   += 4item1*cos(2x[i])item2^2 + 0.1x[i]
-		g[i+1] += 4.0*item2*cos(2.0*x[i+1])*item1*item1 + 0.1*x[i+1]
+    ζ = 20.0
+    n = lastindex(x)
+    fx = 0.0
+    g[1] = ζ*sin(2ζ*x[1])*sin(ζ*x[2])^2+0.1x[1]
+    for i in 1:n-2
+        fx += sin(ζ*x[i])^2*sin(ζ*x[i+1])^2+0.05*(x[i]^2+x[i+1]^2)
+        g[i+1] = 0.2x[i+1] + 40cos(20x[i+1])sin(20x[i])^2*sin(20x[i+1])+40cos(20x[i+1])sin(20x[i+1])sin(20x[i+2])^2
     end
-    return fx, g
+    fx += sin(ζ*x[n-1])^2*sin(ζ*x[n])^2+0.05*(x[n-1]^2+x[n]^2)
+    g[n] = 2ζ*cos(ζ*x[n])*sin(ζ*x[n-1])^2*sin(ζ*x[n])+0.1x[n]
+    return g
 end
-
-x0 = 506ones(5000)
-x0[1] = -506 
-TestSet["GENHUMPS"] = UncProgram("GENHUMPS", GENHUMP_f, GENHUMP_g!, GENHUMP_fg!, 5000, x0)
+x_int = -506.2*ones(5000)
+x_int[1] = -506
+TestSet["GENHUMPS"] = UncProgram("GENHUMPS", GENHUMP_f, GENHUMP_g!, GENHUMP_fg!, 5000, x_int)

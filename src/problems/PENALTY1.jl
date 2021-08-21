@@ -30,7 +30,7 @@ end
 
 function PENALTY1_g!(x, g)
 	a  = 1e-5
-	fx = tail = 0.0
+	tail = 0.0
 	for i in firstindex(x):lastindex(x)
 		item  = x[i] - 1
       	g[i]  = 2a*item
@@ -41,7 +41,6 @@ function PENALTY1_g!(x, g)
 	end
     return g
 end
-
 
 function PENALTY1_fg!(x, g)
 	a  = 1e-5
@@ -59,5 +58,5 @@ function PENALTY1_fg!(x, g)
     return fx, g
 end
 
-@warn "PENALTY1 dimensions cannot be adjusted"
-TestSet["PENALTY1"] = UncProgram("PENALTY1", PENALTY1_f, PENALTY1_g!, PENALTY1_fg!, 1000, 1:1000)
+@warn "PENALTY1 will break in adjdim!()"
+TestSet["PENALTY1"] = UncProgram("PENALTY1", PENALTY1_f, PENALTY1_g!, PENALTY1_fg!, 1000, Vector(1.0:1000.0))

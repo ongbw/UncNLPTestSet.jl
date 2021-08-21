@@ -11,52 +11,39 @@
 #    "Performance of a multi-frontal scheme for partially separable
 #    optimization"
 #    Report 88/4, Dept of Mathematics, FUNDP (Namur, B), 1988.
-#    Implementation translated from Source:
-#    http://eprints.tsu.ge/234/14/Tests%20collection-K-F.pdf
 #
 #    NONDIA.jl.SIF classification OUR2-AN-V-0
 #
 #    Number of variables is variable
+#
+# Daniel Henderson, 08/2021  
 
 function NONDIA_f(x)
-	item = x[1]-1
-	fx = item^2
-	item = 10(x[1] - x[1]^2)
-	fx += item^2
-	for i in firstindex(x)+1:lastindex(x)
-		item = 10(x[1] - x[i]^2)
-		fx += item^2
+	fx = (x[1]-1)^2
+	for i in 2:lastindex(x)
+		fx += 100*(x[1]-x[i-1]^2)^2
 	end
     return fx
 end
 
 function NONDIA_g!(x, g)
-	g[1] = 2x[1]-2
-	item = 10(x[1] - x[1]^2)
-	g[1] += (20 - 40x[1])item
-	for i in firstindex(x)+1:lastindex(x)
-		item = 10(x[1] - x[i]^2)
-		g[1] += 20item
-		g[i] = -40x[i]item
+	g[1] = 2*(x[1]-1)
+	for i in 2:lastindex(x)
+		g[1]   += 200(x[1]-x[i-1]^2)
+		g[i-1] += -400x[i-1]*(x[1] - x[i-1]^2)
 	end
     return g
 end
 
 function NONDIA_fg!(x, g)
-	item = x[1]-1
-	fx = item^2
-	g[1] = 2item
-	item = 10(x[1] - x[1]^2)
-	fx += item^2
-	g[1] += (20 - 40x[1])item
-	for i in firstindex(x)+1:lastindex(x)
-		item = 10(x[1] - x[i]^2)
-		fx += item^2
-		g[1] += 20item
-		g[i] = -40x[i]item
+	fx = (x[1]-1)^2
+	g[1] = 2*(x[1]-1)
+	for i in 2:lastindex(x)
+		fx += 100*(x[1]-x[i-1]^2)^2
+		g[1]   += 200(x[1]-x[i-1]^2)
+		g[i-1] += -400x[i-1]*(x[1] - x[i-1]^2)
 	end
-    return fx, g
+    return g
 end
-
 
 TestSet["NONDIA"] = UncProgram("NONDIA", NONDIA_f, NONDIA_g!, NONDIA_fg!, 5000, -ones(5000))

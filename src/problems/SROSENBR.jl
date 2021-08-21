@@ -9,7 +9,10 @@
 #
 #    SROSENBR.SIF classification SUR2-AN-V-0
 #
-#    Number of variables is variable
+#    Number of variables is variable 
+#
+# Daniel Henderson, 08/2021
+
 
 function SROSENBR_f(x)
 	fx = 0.0
@@ -43,6 +46,6 @@ function SROSENBR_fg!(x, g)
     return fx, g
 end
 
-@warn "SROSENBR will break in adjdim!()"
-x0 = [j % 2 == 0 ? -1.2 : 1.0 for j in 1:10000]
-TestSet["SROSENBR"] = UncProgram("SROSENBR", SROSENBR_f, SROSENBR_g!, SROSENBR_fg!, 10000, x0)
+@warn "SROSENBR will break in adjdim!() and n is assumed to be even!"
+x0 = [j % 2 == 1 ? 1.2 : 1.0 for j in 1:5000]
+TestSet["SROSENBR"] = UncProgram("SROSENBR", SROSENBR_f, SROSENBR_g!, SROSENBR_fg!, 5000, x0)

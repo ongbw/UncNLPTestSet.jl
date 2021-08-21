@@ -1,4 +1,4 @@
-#    Problem : GROUP A
+#    Problem :
 #    *********
 #    The BROYDN7D problem by Oren.
 #
@@ -10,16 +10,19 @@
 #
 #    See also Buckley#84
 #
-#    Implementation translated from Source:
-#    http://eprints.tsu.ge/234/14/Tests%20collection-K-F.pdf
-#
 #    BROYDN7D.SIF classification OUR2-AN-V-0
 #
 #    Number of variables must be greater than 4
+#
+#    This problem has a reputation of issues.
+#
+# Daniel Henderson, 08/2021  
+
+
 
 function BROYDN7D_f(x)
 	n = length(x)
-	fx = abs(-2.0x[2]+1+(3-2x[1])x[1])^(7/3) + abs(-x[n-1] + 1 + (3 - 2.0x[n])x[n])^(7/3) 
+	fx = abs(1-2x[2]+(3-2x[1])x[1])^(7/3) + abs(1-x[n-1]+(3-2x[n])x[n])^(7/3) 
 	for i in 1:Int(n/2)
 		fx += abs(x[i]+x[i+Int(n/2)])^(7/3)
 	end
@@ -95,4 +98,5 @@ function BROYDN7D_fg!(x, g)
 	return fx, g
 end
 
-TestSet["BROYDN7D"] = UncProgram("BROYDN7D", BROYDN7D_f, BROYDN7D_g!, BROYDN7D_fg!, 5000, ones(5000))
+# @warn "TODO: Issue in CUTEst? See comment https://github.com/JuliaSmoothOptimizers/OptimizationProblems.jl/blob/main/src/broydn7d.jl#L50 "
+# TestSet["BROYDN7D"] = UncProgram("BROYDN7D", BROYDN7D_f, BROYDN7D_g!, BROYDN7D_fg!, 5000, ones(5000))

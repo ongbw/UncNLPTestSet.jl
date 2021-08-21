@@ -19,9 +19,8 @@
 #    ENGVAL1.SIF classification OUR2-AN-V-0
 #
 #    N is the number of variables
-let 
 
-function f(x) 
+function ENGVAL1_f(x) 
     fx = 0.0 
     for i in firstindex(x):lastindex(x)-1
         γ = x[i]^2 + x[i+1]^2
@@ -30,7 +29,7 @@ function f(x)
     return fx
 end
 
-function g!(x, g)
+function ENGVAL1_g!(x, g)
     for i in firstindex(x):lastindex(x)-1
         γ = x[i]^2 + x[i+1]^2
         g[i] += 4.0γ*x[i] - 4.0
@@ -39,7 +38,7 @@ function g!(x, g)
     return g
 end
 
-function fg!(x, g)
+function ENGVAL1_fg!(x, g)
     fx = 0.0 
     for i in firstindex(x):lastindex(x)-1
         γ = x[i]^2 + x[i+1]^2
@@ -50,6 +49,4 @@ function fg!(x, g)
     return fx, g
 end
 
-TestSet["ENGVAL1"] = UncProgram("ENGVAL1", f, g!, fg!, 5000, 2.0*ones(5000))
-
-end # end of local scope
+TestSet["ENGVAL1"] = UncProgram("ENGVAL1", ENGVAL1_f, ENGVAL1_g!, ENGVAL1_fg!, 5000, 2.0*ones(5000))

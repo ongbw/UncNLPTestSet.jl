@@ -97,6 +97,7 @@ f(x), ∇f(x)
 Change the dimensions of an UncProgram in the TestSet
 """
 function adjdim!(nlp::UncProgram, n::Number=0)
+    @warn "This is not a stable operation - the starting iterate `x0` may not be correct"
     n = convert(Int, n)
     if n >= nlp.n 
         x0 = cat(nlp.x0, nlp.x0[nlp.n]ones(n-nlp.n), dims=1) 
@@ -104,7 +105,7 @@ function adjdim!(nlp::UncProgram, n::Number=0)
     else # shrink x0
         TestSet[nlp.name] = UncProgram(nlp.name, nlp.f, nlp.g!, nlp.fg!, n, nlp.x0[1:n])
     end
-end ## SO FAR stable, but there is a better way to do this. 
+end #there is a better way to do this. 
 
 for p in readdir(joinpath(@__DIR__, "problems"))
     include(joinpath("problems", p))

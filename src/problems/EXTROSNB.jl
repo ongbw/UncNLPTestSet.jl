@@ -53,11 +53,4 @@ function EXTROSNB_fg!(x, g)
     return fx, g
 end
 
-
-function EXTROSNB(n::Int=1000)
-    return 
-end
-
 TestSet["EXTROSNB"] = UncProgram("EXTROSNB", EXTROSNB_f, EXTROSNB_g!, EXTROSNB_fg!, 1000, -1.0ones(1000))
-
-export EXTROSNB

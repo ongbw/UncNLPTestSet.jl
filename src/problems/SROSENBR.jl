@@ -1,4 +1,4 @@
-#    Problem : GROUP A
+#    Problem :
 #    *********
 #	 The separable extension of Rosenbrock's function.
 #

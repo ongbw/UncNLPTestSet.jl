@@ -65,4 +65,4 @@ init = (n::Int=5000) -> begin
     return n, x0
 end
 
-TestSet["NONDQUAR"] = UncProgram("NONDQUAR", f, g!, fg!, init)
+#TestSet["NONDQUAR"] = UncProgram("NONDQUAR", f, g!, fg!, init)

@@ -3,7 +3,7 @@
 #   - use the function dump() to show internals
 
 module UncNLPTestSet
-using LinearAlgebra, ForwardDiff
+using LinearAlgebra, ForwardDiff, Printf
 
 # utility
 macro lencheck(l, vars...)
@@ -101,9 +101,8 @@ end
 ```math
 ∇^2f(\boldmath{x})
 ```
-Returns the hessian of an objective function at the vector x by performing
-Automatic Differentiation on the analyically specified gradient of the 
-objective function. 
+Determines the Hessian matrix of an objective function at the point x,
+by means of an Automatic Differentiation of the nlp's gradient formula. 
 """
 function hessAD(nlp::UncProgram, x::Vector{<:Real}) 
     @lencheck nlp.n x
@@ -117,24 +116,49 @@ end
 ```math
 f(x), ∇f(x)
 ```
-Change the dimensions of an UncProgram in the TestSet
+Change the dimensions of a specified problem in the TestSet
 """
 function adjdim!(nlp::UncProgram, n::Number=0)
-    @warn "This is not a stable operation - the starting iterate `x0` may not be correct"
-    n = convert(Int, n)
-    if n >= nlp.n 
-        x0 = cat(nlp.x0, nlp.x0[nlp.n]ones(n-nlp.n), dims=1) 
-        TestSet[nlp.name] = UncProgram(nlp.name, nlp.f, nlp.g!, nlp.fg!, n, x0)
-    else # shrink x0
-        TestSet[nlp.name] = UncProgram(nlp.name, nlp.f, nlp.g!, nlp.fg!, n, nlp.x0[1:n])
+    @warn "This operation may be unstable"
+    n, x0 = nlp.init(n)
+    nlp.n = n
+    nlp.x0 = x0
+end
+
+"""
+    Programs
+
+```math
+f(x), ∇f(x)
+```
+A list of unconstrained nonlinear programming problems in the current testing enviroment. 
+"""
+function programs()
+    for nlp in values(TestSet)
+        @printf "%s with dimension %d\n" nlp.name nlp.n
     end
-end #there is a better way to do this. 
+end
+
+"""
+    Select
+
+```math
+f(x), ∇f(x)
+```
+Returns an instance of UncProgram. 
+"""
+function select_program(key::String)
+    if key ∈ keys(TestSet)
+        return TestSet[key]
+    end
+    @warn "The program $s is not in the testing enviroment" 
+end
 
 for p in readdir(joinpath(@__DIR__, "problems"))
     include(joinpath("problems", p))
 end
 
 
-export obj, grad, obj_grad, TestSet, adjdim!, gradAD, hessAD
+export obj, grad, obj_grad, TestSet, adjdim!, hessAD, programs, select_program
 
 end # module UncNLPTestSet

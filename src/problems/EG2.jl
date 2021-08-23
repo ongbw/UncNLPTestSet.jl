@@ -63,4 +63,4 @@ init = (n::Int=1000) -> begin
     return n, zeros(n)
 end 
 
-TestSet["EG2"] = UncProgram("EG2", f, g!, fg!, init)
+#TestSet["EG2"] = UncProgram("EG2", f, g!, fg!, init)

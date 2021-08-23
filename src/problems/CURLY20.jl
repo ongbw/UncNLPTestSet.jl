@@ -35,7 +35,7 @@ function CURLY20_g!(x, g)
 	for i in 1:n
         q[i] = sum(x[j] for j = i:min(i + 20, n))
 		for j = i:min(i + 20, n)
-        	g[j] += sum(4q[i]^3 - 40q[i] - 0.1)
+        	g[j] += 4q[i]^3 - 40q[i] - 0.1
 		end
 	end
     return g
@@ -49,7 +49,7 @@ function CURLY20_fg!(x, g)
         q[i] = sum(x[j] for j = i:min(i + 20, n))
 		fx  += q[i]^4 - 20q[i]^2 - 0.1q[i]
 		for j = i:min(i + 30, n)
-        	g[j] += sum(4q[i]^3 - 40q[i] - 0.1)
+        	g[j] += 4q[i]^3 - 40q[i] - 0.1
 		end
 	end
     return fx, g

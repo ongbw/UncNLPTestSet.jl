@@ -35,7 +35,7 @@ function CURLY10_g!(x, g)
 	for i in 1:n
         q[i] = sum(x[j] for j = i:min(i + 10, n))
 		for j = i:min(i + 10, n)
-        	g[j] += sum(4q[i]^3 - 40q[i] - 0.1)
+        	g[j] += 4q[i]^3 - 40q[i] - 0.1
 		end
 	end
     return g
@@ -49,13 +49,13 @@ function CURLY10_fg!(x, g)
         q[i] = sum(x[j] for j = i:min(i + 10, n))
 		fx  += q[i]^4 - 20q[i]^2 - 0.1q[i]
 		for j = i:min(i + 10, n)
-        	g[j] += sum(4q[i]^3 - 40q[i] - 0.1)
+			g[j] += 4q[i]^3 - 40q[i] - 0.1
 		end
 	end
     return fx, g
 end
 
-@warn "CURLY10 will break in adjdim!() and n≥2 must hold"
+@warn "CURLY* will break in adjdim!() and n≥2 must hold"
 
 x0 = [0.0001*i/(10000 + 1) for i in 1:10000]
 TestSet["CURLY10"] = UncProgram("CURLY10", CURLY10_f, CURLY10_g!, CURLY10_fg!, 10000, x0)

@@ -25,7 +25,7 @@ function ARWHEAD_f(x)
     return fx
 end
 
-function ARWHEAD_g!(x, g)
+function ARWHEAD_g!(g, x)
     gn = 0.0
     cxn = 4.0*x[lastindex(x)]
     xn_sqr = cxn^2/16.0
@@ -38,7 +38,7 @@ function ARWHEAD_g!(x, g)
     return g
 end
 
-function ARWHEAD_fg!(x, g) 
+function ARWHEAD_fg!(g, x) 
     gn = fx = 0.0
     cxn = 4.0*x[lastindex(x)]
     xn_sqr = cxn^2/16.0

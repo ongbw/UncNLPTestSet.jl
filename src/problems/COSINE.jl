@@ -21,7 +21,7 @@ function COSINE_f(x)
     return fx
 end
 
-function COSINE_g!(x, g)
+function COSINE_g!(g, x)
     for i in firstindex(x):lastindex(x)-1
         α = -0.5x[i+1]+x[i]^2
         g[i] -= 2.0sin(α)x[i]
@@ -30,7 +30,7 @@ function COSINE_g!(x, g)
     return g
 end
  
-function COSINE_fg!(x, g)
+function COSINE_fg!(g, x)
     fx = 0.0 
     for i in firstindex(x):lastindex(x)-1
         α = -0.5x[i+1]+x[i]^2

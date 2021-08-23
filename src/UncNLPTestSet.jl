@@ -3,7 +3,7 @@
 #   - use the function dump() to show internals
 
 module UncNLPTestSet
-using LinearAlgebra
+using LinearAlgebra, ForwardDiff
 
 # utility
 macro lencheck(l, vars...)
@@ -25,13 +25,13 @@ end
 
 A base parent type of each unconstrained non-linear program
 """
-struct UncProgram
+struct UncProgram{T<:Real}
     name::String
     f::Function
     g!::Function
     fg!::Function
-    n::Int
-    x0::AbstractVector{<:Real}
+    n::Integer
+    x0::Vector{T}
 end
 
 
@@ -41,7 +41,7 @@ end
 A dictionary mapping the problem name it's corresponding UncProgram.
 The dictionary is the users interface to problems contained in UncNLPTestSet.jl
 """
-TestSet = Dict{AbstractString, UncProgram}()
+TestSet = Dict{String, UncProgram}()
 
 
 """
@@ -52,7 +52,7 @@ f(x)
 ````
 Evaluate the objective function at a point x.
 """
-function obj(nlp::UncProgram, x::AbstractVector{<:Real})
+function obj(nlp::UncProgram, x::Vector{<:Real})
     @lencheck nlp.n x
     return nlp.f(x)
 end
@@ -66,7 +66,7 @@ end
 ```
 Evaluate the gradient of the objective function at a point x.
 """
-function grad(nlp::UncProgram, x::AbstractVector{<:Real})
+function grad(nlp::UncProgram, x::Vector{<:Real})
     @lencheck nlp.n x
     g = zeros(length(x))
     return nlp.g!(x, g)
@@ -82,10 +82,26 @@ f(x), ∇f(x)
 Evaluate the gradient and it's objective function at a point x, 
 by a iterating over the dimesions once.
 """
-function objgrad(nlp::UncProgram, x::AbstractVector{<:Real})
+function objgrad(nlp::UncProgram, x::Vector{<:Real})
     @lencheck nlp.n x
     g = zeros(length(x))
     return nlp.fg!(x, g)
+end
+
+"""
+    hessAD
+
+```math
+∇^2f(\boldmath{x})
+```
+Returns the hessian of an objective function at the vector x by performing
+Automatic Differentiation on the analyically specified gradient of the 
+objective function. 
+"""
+function hessAD(nlp::UncProgram, x::Vector{<:Real}) 
+    @lencheck nlp.n x
+    g = zeros(length(x))
+    return ForwardDiff.jacobian(nlp.g!, g, x)
 end
 
 """
@@ -111,6 +127,6 @@ for p in readdir(joinpath(@__DIR__, "problems"))
     include(joinpath("problems", p))
 end
 
-export obj, grad, obj_grad, TestSet, adjdim!
+export obj, grad, obj_grad, TestSet, adjdim!, gradAD, hessAD
 
 end # module UncNLPTestSet

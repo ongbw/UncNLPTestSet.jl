@@ -29,7 +29,7 @@ function CURLY10_f(x)
     return fx
 end
 
-function CURLY10_g!(x, g)
+function CURLY10_g!(g, x)
 	n = lastindex(x)
     q = similar(x)
 	for i in 1:n
@@ -41,7 +41,7 @@ function CURLY10_g!(x, g)
     return g
 end
 
-function CURLY10_fg!(x, g)
+function CURLY10_fg!(g, x)
 	fx = 0.0
 	n = lastindex(x)
     q = similar(x)

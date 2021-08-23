@@ -14,7 +14,7 @@
 #
 # Daniel Henderson, 08/2021   
 
-function QUARTC_f(x)
+f = (x) -> begin
 	fx = 0.0
 	for i in firstindex(x):lastindex(x)
 		fx += (x[i] - i)^4
@@ -22,14 +22,14 @@ function QUARTC_f(x)
     return fx
 end
 
-function QUARTC_g!(x, g)
+g! = (g, x) -> begin
 	for i in firstindex(x):lastindex(x)
 		g[i] = 4(x[i] - i)^3
 	end
     return g
 end
 
-function QUARTC_fg!(x, g)
+fg! = (g, x) -> begin
 	fx = 0.0
 	for i in firstindex(x):lastindex(x)
 		fx  += (x[i] - i)^4
@@ -38,4 +38,8 @@ function QUARTC_fg!(x, g)
     return fx, g
 end
 
-TestSet["QUARTC"] = UncProgram("QUARTC", QUARTC_f, QUARTC_g!, QUARTC_fg!, 5000, 2ones(5000))
+init = (n::Int=5000) -> begin
+    return n, 2.0*ones(n)
+end
+
+TestSet["QUARTC"] = UncProgram("QUARTC",  f, g!, fg!, init)

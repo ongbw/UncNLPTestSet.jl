@@ -18,7 +18,7 @@
 #
 # Daniel Henderson, 08/2021  
 
-function NONDQUAR_f(x)
+f = (x) -> begin
 	n  = lastindex(x)
 	fx =  (x[1]-x[2])^2 + (x[n-1] - x[n])^2
 	for i in 1:n-2
@@ -27,7 +27,7 @@ function NONDQUAR_f(x)
     return fx
 end
 
-function NONDQUAR_g!(x, g)
+g! = (g, x) -> begin
 	n    = lastindex(x)
 	g[1] = 2(x[1] - x[2]) + 4(x[1] + x[2] + x[n])^3
 	g[2] = -2(x[1] - x[2]) + 4(x[1] + x[2] + x[n])^3 + 4(x[2] + x[3] + x[n])^3
@@ -41,7 +41,7 @@ function NONDQUAR_g!(x, g)
 	return g
 end
 
-function NONDQUAR_fg!(x, g)
+fg! = (g, x) -> begin
 	n    = lastindex(x)
 	fx   =  (x[1]-x[2])^2 + (x[n-1] - x[n])^2 + (x[1]+x[2]+x[n])^4 + (x[2]+x[3]+x[n])^4
 	g[1] = 2(x[1] - x[2]) + 4(x[1] + x[2] + x[n])^3 
@@ -57,6 +57,12 @@ function NONDQUAR_fg!(x, g)
 	return fx, g
 end
 
-@warn "NONDQUAR will break in adjdim!(), dimensions must be even"
-x0 = [j % 2 == 0 ? -1.0 : 1.0 for j in 1:5000]
-TestSet["NONDQUAR"] = UncProgram("NONDQUAR", NONDQUAR_f, NONDQUAR_g!, NONDQUAR_fg!, 5000, x0)
+init = (n::Int=5000) -> begin
+	mod(n, 2) > 0 && @warn "NONDQUAR: number of variables must be even" 
+	q = max(1, div(n, 2))
+	n = 2q
+	x0 = [j % 2 == 0 ? -1.0 : 1.0 for j in 1:n]
+    return n, x0
+end
+
+TestSet["NONDQUAR"] = UncProgram("NONDQUAR", f, g!, fg!, init)

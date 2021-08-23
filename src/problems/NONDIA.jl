@@ -18,7 +18,7 @@
 #
 # Daniel Henderson, 08/2021  
 
-function NONDIA_f(x)
+f = (x) -> begin
 	fx = (x[1]-1)^2
 	for i in 2:lastindex(x)
 		fx += 100*(x[1]-x[i-1]^2)^2
@@ -26,7 +26,7 @@ function NONDIA_f(x)
     return fx
 end
 
-function NONDIA_g!(x, g)
+g! = (g, x) -> begin
 	g[1] = 2*(x[1]-1)
 	for i in 2:lastindex(x)
 		g[1]   += 200(x[1]-x[i-1]^2)
@@ -35,7 +35,7 @@ function NONDIA_g!(x, g)
     return g
 end
 
-function NONDIA_fg!(x, g)
+fg! = (g, x) -> begin
 	fx = (x[1]-1)^2
 	g[1] = 2*(x[1]-1)
 	for i in 2:lastindex(x)
@@ -46,4 +46,11 @@ function NONDIA_fg!(x, g)
     return g
 end
 
-TestSet["NONDIA"] = UncProgram("NONDIA", NONDIA_f, NONDIA_g!, NONDIA_fg!, 5000, -ones(5000))
+init = (n::Int=5000) -> begin
+	n < 2 && @warn("ARWHEAD: number of variables must be ≥ 2")
+	n = max(n, 2)
+    
+    return n, -1.0*ones(n)
+end
+
+TestSet["NONDIA"] = UncProgram("NONDIA", f, g!, fg!, init)

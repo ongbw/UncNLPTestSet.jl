@@ -16,7 +16,7 @@
 #
 # Daniel Henderson, 08/2021
 
-function DIXMAANG_f(x)
+f = (x) -> begin
 	n = lastindex(x)
 	m = Int(n/3)
 	fx = 1.0
@@ -34,7 +34,7 @@ function DIXMAANG_f(x)
     return fx
 end
 
-function DIXMAANG_g!(x, g)
+g! = (g, x) -> begin
 	n = lastindex(x)
 	m = Int(n/3)
 
@@ -69,7 +69,7 @@ function DIXMAANG_g!(x, g)
 	return g
 end
 
-function DIXMAANG_fg!(x, g)
+fg! = (g, x) -> begin
 	n = lastindex(x)
 	m = Int(n/3)
 	fx = 1.0
@@ -109,4 +109,13 @@ function DIXMAANG_fg!(x, g)
 	return fx, g
 end
 
-TestSet["DIXMAANG"] = UncProgram("DIXMAANG", DIXMAANG_f, DIXMAANG_g!, DIXMAANG_fg!, 3000, 2ones(3000))
+init = (n::Int=3000) -> begin
+	mod(n, 3) > 0 && @warn "DIXMAANG: number of variables must be divisible by 3" 
+	q = max(1, div(n, 3))
+	n = 3*q
+
+	x0 = 2.0*ones(n)
+    return n, x0
+end
+
+TestSet["DIXMAANG"] = UncProgram("DIXMAANG", f, g!, fg!, init)

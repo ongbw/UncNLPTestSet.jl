@@ -20,7 +20,7 @@
 
 
 
-function BROYDN7D_f(x)
+f = (x) -> begin
 	n = length(x)
 	fx = abs(1-2x[2]+(3-2x[1])x[1])^(7/3) + abs(1-x[n-1]+(3-2x[n])x[n])^(7/3) 
 	for i in 1:Int(n/2)
@@ -32,7 +32,7 @@ function BROYDN7D_f(x)
 	return fx
 end
 
-function BROYDN7D_g!(x, g)
+g! = (g, x) -> begin
 	n      = length(x)
 	first  = -2.0*x[1] + 1 + (3.0-2.0*x[1])x[1]
 	last   = -x[n-1] + 1 + (3.0-2.0*x[n])x[n]
@@ -63,7 +63,7 @@ function BROYDN7D_g!(x, g)
 	return g
 end
 
-function BROYDN7D_fg!(x, g)
+fg! = (g, x) -> begin
 	n      = length(x)
 	first  = -2.0*x[1] + 1 + (3.0-2.0*x[1])x[1]
 	last   = -x[n-1] + 1 + (3.0-2.0*x[n])x[n]
@@ -98,5 +98,13 @@ function BROYDN7D_fg!(x, g)
 	return fx, g
 end
 
-# @warn "TODO: Issue in CUTEst? See comment https://github.com/JuliaSmoothOptimizers/OptimizationProblems.jl/blob/main/src/broydn7d.jl#L50 "
-# TestSet["BROYDN7D"] = UncProgram("BROYDN7D", BROYDN7D_f, BROYDN7D_g!, BROYDN7D_fg!, 5000, ones(5000))
+init = (n::Int=5000) -> begin
+	mod(n, 2) > 0 && @warn "BROYDN7D: number of variables must be even" 
+	q = max(1, div(n, 2))
+	n = 2q
+
+    return n, ones(n)
+end
+
+@warn "TODO: Issue in CUTEst? See comment https://github.com/JuliaSmoothOptimizers/OptimizationProblems.jl/blob/main/src/broydn7d.jl#L50 "
+# TestSet["BROYDN7D"] = UncProgram("BDQRTIC", f, g!, fg!, init)

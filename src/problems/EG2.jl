@@ -16,8 +16,10 @@
 #    EG2.SIF classification OUR2-AN-1000-0
 #
 #    Number of variables (at least 2)
+#
+# Daniel Henderson, 08/2021
 
-function EG2_f(x) 
+f = (x) -> begin
     fx = 0.0 
     α = x[1] - 1.0
     for i in firstindex(x):lastindex(x)-1
@@ -28,7 +30,7 @@ function EG2_f(x)
 end
 
 
-function EG2_g!(x, g)
+g! = (g, x) -> begin
     α = x[1] - 1
     xn = x[lastindex(x)] 
     g[lastindex(x)] = cos(xn^2)xn
@@ -40,7 +42,7 @@ function EG2_g!(x, g)
     return g
 end
 
-function EG2_fg!(x, g)
+fg! = (g, x) -> begin
     fx = 0.0
     α = x[1] - 1.0
     xn = x[lastindex(x)] 
@@ -54,4 +56,11 @@ function EG2_fg!(x, g)
     return fx, g
 end
 
-TestSet["EG2"] = UncProgram("EG2", EG2_f, EG2_g!, EG2_fg!, 1000, zeros(1000))
+init = (n::Int=1000) -> begin
+    n < 2 && @warn("EG2: number of variables must be ≥ 2")
+    n = max(n, 2)
+    
+    return n, zeros(n)
+end 
+
+TestSet["EG2"] = UncProgram("EG2", f, g!, fg!, init)

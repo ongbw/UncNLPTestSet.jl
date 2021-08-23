@@ -16,9 +16,9 @@
 #
 #    CRAGGLVY.SIF classification  OUR2-AY-V-0
 #
-#    Number of variables (variable, based on imput M, the no. of group sets) 
+#    Number of variables (variable, based on imput M, the number of group sets) 
 
-function CRAGGLVY_f(x) 
+f = (x) -> begin
     fx = 1.0
     for i in firstindex(x):2:lastindex(x)-3
         item1   = exp(x[i]) - x[i+1]
@@ -31,7 +31,7 @@ function CRAGGLVY_f(x)
     return fx
 end
 
-function CRAGGLVY_g!(x, g)
+g! = (g, x) -> begin
     for i in firstindex(x):2:lastindex(x)-3
         item1   = exp(x[i]) - x[i+1]
         item2   = x[i+1] - x[i+2]
@@ -46,7 +46,7 @@ function CRAGGLVY_g!(x, g)
     return g
 end
 
-function CRAGGLVY_fg!(x, g)
+fg! = (g, x) -> begin
     fx = 1.0 
     for i in firstindex(x):2:lastindex(x)-3
         item1   = exp(x[i]) - x[i+1]
@@ -63,8 +63,14 @@ function CRAGGLVY_fg!(x, g)
     return fx, g
 end
 
+init = (n::Int=5000) -> begin
+	n < 2 && @warn("CRAGGLVY: number of variables must be ≥ 2")
+	n = max(n, 2)
 
+    x0 = 2*ones(5000)
+    x0[1] = 1.0
+    return n, x0
+end
 
-xint = 2*ones(5000)
-xint[1] = 1.0
-# TestSet["CRAGGLVY"] = UncProgram("CRAGGLVY", CRAGGLVY_f, CRAGGLVY_g!, CRAGGLVY_fg!, 5000, xint)
+@warn "TODO: Debug CRAGGLVY"
+# TestSet["CRAGGLVY"] = UncProgram("CRAGGLVY",  f, g!, fg!, init)

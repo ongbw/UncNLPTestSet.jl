@@ -15,7 +15,7 @@
 #
 # Daniel Henderson, 08/2021  
 
-function GENHUMP_f(x) 
+f = (x) -> begin
 	fx = 0.0
     ζ = 20.0
     for i in firstindex(x):lastindex(x)-1
@@ -24,7 +24,7 @@ function GENHUMP_f(x)
     return fx
 end
 
-function GENHUMP_g!(x, g)
+g! = (g, x) -> begin
     ζ = 20.0
     n = lastindex(x)
 
@@ -36,7 +36,7 @@ function GENHUMP_g!(x, g)
     return g
 end
 
-function GENHUMP_fg!(x, g) 
+fg! = (g, x) -> begin
     ζ = 20.0
     n = lastindex(x)
     fx = 0.0
@@ -49,6 +49,14 @@ function GENHUMP_fg!(x, g)
     g[n] = 2ζ*cos(ζ*x[n])*sin(ζ*x[n-1])^2*sin(ζ*x[n])+0.1x[n]
     return g
 end
-x_int = -506.2*ones(5000)
-x_int[1] = -506
-TestSet["GENHUMPS"] = UncProgram("GENHUMPS", GENHUMP_f, GENHUMP_g!, GENHUMP_fg!, 5000, x_int)
+
+
+init = (n::Int=5000) -> begin
+	n < 2 && @warn("GENHUMPS: number of variables must be ≥ 2")
+	n = max(n, 2)
+    x0 = -506.2*ones(5000)
+    x0[1] = -506 
+    return n, x0
+end
+
+TestSet["GENHUMPS"] = UncProgram("GENHUMPS", f, g!, fg!, init)

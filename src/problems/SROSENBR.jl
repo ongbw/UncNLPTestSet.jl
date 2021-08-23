@@ -14,7 +14,7 @@
 # Daniel Henderson, 08/2021
 
 
-function SROSENBR_f(x)
+f = (x) -> begin
 	fx = 0.0
 	for i in firstindex(x):2:lastindex(x)
 		t1     = 1 - x[i]
@@ -24,7 +24,7 @@ function SROSENBR_f(x)
     return fx
 end
 
-function SROSENBR_g!(x, g)
+g! = (g, x) -> begin
 	for i in firstindex(x):2:lastindex(x)
 		t1     = 1 - x[i]
 		t2     = 10(x[i+1] - x[i]^2)
@@ -34,7 +34,7 @@ function SROSENBR_g!(x, g)
     return g
 end
 
-function SROSENBR_fg!(x, g)
+fg! = (g, x) -> begin
 	fx = 0.0
 	for i in firstindex(x):2:lastindex(x)
 		t1     = 1 - x[i]
@@ -46,6 +46,13 @@ function SROSENBR_fg!(x, g)
     return fx, g
 end
 
-@warn "SROSENBR will break in adjdim!() and n is assumed to be even!"
-x0 = [j % 2 == 1 ? 1.2 : 1.0 for j in 1:5000]
-TestSet["SROSENBR"] = UncProgram("SROSENBR", SROSENBR_f, SROSENBR_g!, SROSENBR_fg!, 5000, x0)
+init = (n::Int=5000) -> begin
+	mod(n, 2) > 0 && @warn "SROSENBR: number of variables must be even" 
+	q = max(1, div(n, 2))
+	n = 2q
+
+    x0 = [j % 2 == 1 ? 1.2 : 1.0 for j in 1:n]
+    return n, x0
+end
+
+TestSet["SROSENBR"] = UncProgram("SROSENBR",  f, g!, fg!, init)

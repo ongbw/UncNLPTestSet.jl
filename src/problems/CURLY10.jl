@@ -18,7 +18,7 @@
 #
 # Daniel Henderson, 08/2021
 
-function CURLY10_f(x)
+f = (x) -> begin
 	n = lastindex(x)
     q = similar(x)
 	fx = 0.0
@@ -29,7 +29,7 @@ function CURLY10_f(x)
     return fx
 end
 
-function CURLY10_g!(g, x)
+g! = (g, x) -> begin
 	n = lastindex(x)
     q = similar(x)
 	for i in 1:n
@@ -41,7 +41,7 @@ function CURLY10_g!(g, x)
     return g
 end
 
-function CURLY10_fg!(g, x)
+fg! = (g, x) -> begin
 	fx = 0.0
 	n = lastindex(x)
     q = similar(x)
@@ -55,7 +55,11 @@ function CURLY10_fg!(g, x)
     return fx, g
 end
 
-@warn "CURLY* will break in adjdim!() and n≥2 must hold"
+init = (n::Int=10000) -> begin
+	n < 2 && @warn("CURLY10: number of variables must be ≥ 2")
+	n = max(n, 2)
+	x0 = [0.0001*i/(n+ 1) for i in 1:n]
+    return n, x0
+end
 
-x0 = [0.0001*i/(10000 + 1) for i in 1:10000]
-TestSet["CURLY10"] = UncProgram("CURLY10", CURLY10_f, CURLY10_g!, CURLY10_fg!, 10000, x0)
+TestSet["CURLY10"] = UncProgram("CURLY10", f, g!, fg!, init)

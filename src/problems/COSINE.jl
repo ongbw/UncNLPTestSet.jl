@@ -12,17 +12,17 @@
 #
 #    Number of variables (variable)
 
-function COSINE_f(x) 
+f = (x) -> begin
     fx = 0.0
-    for i in firstindex(x):lastindex(x)-1
+    for i in 1:lastindex(x)-1
         α = -0.5x[i+1]+x[i]^2
         fx += cos(α)
     end
     return fx
 end
 
-function COSINE_g!(g, x)
-    for i in firstindex(x):lastindex(x)-1
+g! = (g, x) -> begin
+    for i in 1:lastindex(x)-1
         α = -0.5x[i+1]+x[i]^2
         g[i] -= 2.0sin(α)x[i]
         g[i+1] += 0.5sin(α)
@@ -30,9 +30,9 @@ function COSINE_g!(g, x)
     return g
 end
  
-function COSINE_fg!(g, x)
+fg! = (g, x) -> begin
     fx = 0.0 
-    for i in firstindex(x):lastindex(x)-1
+    for i in 1:lastindex(x)-1
         α = -0.5x[i+1]+x[i]^2
         fx += cos(α)
         g[i] -= 2.0sin(α)*x[i]
@@ -41,4 +41,9 @@ function COSINE_fg!(g, x)
     return fx, g
 end
 
-TestSet["COSINE"] = UncProgram("COSINE", COSINE_f, COSINE_g!, COSINE_fg!, 10000, ones(10000))
+init = (n::Int=10000) -> begin
+    n < 2 && @warn("COSINE: number of variables must be ≥ 2")
+    return n, ones(n)
+end
+
+TestSet["COSINE"] = UncProgram("COSINE", f, g!, fg!, init)

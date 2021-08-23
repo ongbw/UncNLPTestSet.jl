@@ -16,7 +16,7 @@
 #
 # Daniel Henderson, 08/2021
 
-function DIXMAANB_f(x)
+f = (x) -> begin
 	n = lastindex(x)
 	m = Int(n/3)
 	fx = 1.0
@@ -32,7 +32,7 @@ function DIXMAANB_f(x)
     return fx
 end
 
-function DIXMAANB_g!(x, g)
+g! = (g, x) -> begin
 	n = lastindex(x)
 	m = Int(n/3)
 	α = 1.0
@@ -66,7 +66,7 @@ function DIXMAANB_g!(x, g)
 	return g
 end
 
-function DIXMAANB_fg!(x, g)
+fg! = (g, x) -> begin
 	n = lastindex(x)
 	m = Int(n/3)
 	fx = 1.0
@@ -106,7 +106,17 @@ function DIXMAANB_fg!(x, g)
 end
 
 @warn "TODO: Clean up DIXMAANB (and others) implementation. See comment block"
-TestSet["DIXMAANB"] = UncProgram("DIXMAANB", DIXMAANB_f, DIXMAANB_g!, DIXMAANB_fg!, 3000, 2ones(3000))
+
+init = (n::Int=3000) -> begin
+	mod(n, 3) > 0 && @warn "DIXMAANB: number of variables must be divisible by 3" 
+	q = max(1, div(n, 3))
+	n = 3*q
+
+	x0 = 2.0*ones(n)
+    return n, x0
+end
+
+TestSet["DIXMAANB"] = UncProgram("DIXMAANB", f, g!, fg!, init)
 
 # A cleaner implmentation might look like this: (issues rebasing S2, g[n] and g[m] need to be fixed)
 # function g!(x, g)

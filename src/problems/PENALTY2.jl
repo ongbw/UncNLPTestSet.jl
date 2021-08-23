@@ -22,7 +22,7 @@
 #
 # Daniel Henderson, 08/2021   
 
-function PENALTY2_f(x)
+f = (x) -> begin
 	@warn "PENALTY2.jl doesn't agree with CUTEst or a JuMP (all three conflict)"
 	N  = lastindex(x)
 	fx = (x[1]-0.2)^2
@@ -46,7 +46,7 @@ function PENALTY2_f(x)
 end
 
 # check chain rule use on product of sum term 
-function PENALTY2_g!(x, g)
+g! = (g, x) -> begin
     N  = lastindex(x)
 	γ  = (1e-5)/5
 	α  = N*x[1]^2-1
@@ -65,9 +65,14 @@ function PENALTY2_g!(x, g)
 end
 
 
-function PENALTY2_fg!(x, g)
+fg! = (g, x) -> begin
     return error("PENALTY2 fg! not implmented")
 end
 
-#@warn "PENALTY2 dimensions must be greater than 3."
-#TestSet["PENALTY2"] = UncProgram("PENALTY2", PENALTY2_f, PENALTY2_g!, PENALTY2_fg!, 200, 0.5ones(200))
+init = (n::Int=1000) -> begin
+	x0 = Vector(1.0:1.0:n)
+    return n, x0
+end
+
+@warn "TODO: Debug PENALTY2"
+#TestSet["PENALTY2"] = UncProgram("PENALTY2", f, g!, fg!, init)

@@ -14,8 +14,10 @@
 #    EDENSCH.SIF classification  OUR2-AN-V-0
 #
 #    Number of variables (at least 2)
+#
+# Daniel Henderson, 08/2021
 
-function EDENSCH_f(x)
+f = (x) -> begin
     fx = 0.0
     for i in firstindex(x):lastindex(x)-1
         item1 = x[i] - 2
@@ -26,7 +28,7 @@ function EDENSCH_f(x)
     return fx
 end
 
-function EDENSCH_g!(x, g)
+g! = (g, x) -> begin
     for i in firstindex(x):lastindex(x)-1
         item1 = x[i] - 2
         item2 = x[i]*x[i+1] - 2x[i+1]
@@ -37,7 +39,7 @@ function EDENSCH_g!(x, g)
     return g
 end
 
-function EDENSCH_fg!(x, g)
+fg! = (g, x) -> begin
     fx = 0.0
     for i in firstindex(x):lastindex(x)-1
         item1 = x[i] - 2
@@ -50,4 +52,10 @@ function EDENSCH_fg!(x, g)
     return fx, g
 end
 
-# TestSet["EDENSCH"] = UncProgram("EDENSCH", EDENSCH_f, EDENSCH_g!, EDENSCH_fg!, 2000, 8ones(2000))
+init = (n::Int=2000) -> begin
+
+    return n, 8.0*ones(n)
+end
+
+@warn "TODO: Debug EDENSCH"
+# TestSet["EDENSCH"] = UncProgram("EDENSCH", f, g!, fg!, init)

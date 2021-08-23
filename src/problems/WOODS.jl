@@ -28,7 +28,7 @@
 #
 # Daniel Henderson, 08/2021  
 
-function WOODS_f(x)
+f = (x) -> begin
 	fx = 0.0
 	for i in 1:Int(lastindex(x)/4)
 		fx += (100*(x[4*i-2]-x[4*i-3]^2)^2 + (1-x[4*i-3])^2 + 90*(x[4*i]-x[4*i-1]^2)^2 + (1-x[4*i-1])^2 + 10*(x[4*i-2]+x[4*i]-2)^2 + 0.1*(x[4*i-2]-x[4*i])^2)
@@ -36,7 +36,7 @@ function WOODS_f(x)
     return fx
 end
 
-function WOODS_g!(x, g)
+g! = (g, x) -> begin
 	for i in 1:Int(lastindex(x)/4)
 		g[4i-3] = -2(1-x[4i-3]) - 400*x[4i-3]*(x[4i-2]-x[4i-3]^2)
 		g[4i-2] = 200(x[4i-2]-x[4i-3]^2) + 0.2(x[4i-2]-x[4i]) + 20(x[4i-2] + x[4i]-2)
@@ -46,7 +46,7 @@ function WOODS_g!(x, g)
     return g
 end
 
-function WOODS_fg!(x, g)
+fg! = (g, x) -> begin
 	fx = 0.0
 	for i in 1:Int(lastindex(x)/4)
 		fx += (100*(x[4*i-2]-x[4*i-3]^2)^2 + (1-x[4*i-3])^2 + 90*(x[4*i]-x[4*i-1]^2)^2 + (1-x[4*i-1])^2 + 10*(x[4*i-2]+x[4*i]-2)^2 + 0.1*(x[4*i-2]-x[4*i])^2)
@@ -58,6 +58,13 @@ function WOODS_fg!(x, g)
     return fx, g
 end
 
-@warn "WOODS will break in adjdim!()"
-x0 = [j % 2 == 1 ? -3.0 : -1.0 for j in 1:4000]
-TestSet["WOODS"] = UncProgram("WOODS", WOODS_f, WOODS_g!, WOODS_fg!, 4000, x0)
+init = (n::Int=4000) -> begin
+	mod(n, 4) > 0 && @warn "WOODS: number of variables must be divisible by 4" 
+	q = max(1, div(n, 4))
+	n = 4*q
+
+	x0 = [j % 2 == 1 ? -3.0 : -1.0 for j in 1:n]
+    return n, x0
+end
+
+TestSet["WOODS"] = UncProgram("WOODS", f, g!, fg!, init)

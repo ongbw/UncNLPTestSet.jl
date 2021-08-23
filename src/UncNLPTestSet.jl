@@ -25,13 +25,20 @@ end
 
 A base parent type of each unconstrained non-linear program
 """
-struct UncProgram{T<:Real}
+mutable struct UncProgram
     name::String
     f::Function
     g!::Function
     fg!::Function
+    init::Function
+    # initlized feilds 
     n::Integer
-    x0::Vector{T}
+    x0::Vector{T} where T<:Real
+
+    function UncProgram(name, f, g!, fg!, init)
+        n, x0 = init()
+        new(name, f, g!, fg!, init, n, x0)
+    end 
 end
 
 
@@ -69,7 +76,7 @@ Evaluate the gradient of the objective function at a point x.
 function grad(nlp::UncProgram, x::Vector{<:Real})
     @lencheck nlp.n x
     g = zeros(length(x))
-    return nlp.g!(x, g)
+    return nlp.g!(g, x)
 end
 
 
@@ -126,6 +133,7 @@ end #there is a better way to do this.
 for p in readdir(joinpath(@__DIR__, "problems"))
     include(joinpath("problems", p))
 end
+
 
 export obj, grad, obj_grad, TestSet, adjdim!, gradAD, hessAD
 

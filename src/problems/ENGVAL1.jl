@@ -19,8 +19,10 @@
 #    ENGVAL1.SIF classification OUR2-AN-V-0
 #
 #    N is the number of variables
+#
+# Daniel Henderson, 08/2021
 
-function ENGVAL1_f(x) 
+f = (x) -> begin
     fx = 0.0 
     for i in firstindex(x):lastindex(x)-1
         γ = x[i]^2 + x[i+1]^2
@@ -29,7 +31,7 @@ function ENGVAL1_f(x)
     return fx
 end
 
-function ENGVAL1_g!(x, g)
+g! = (g, x) -> begin
     for i in firstindex(x):lastindex(x)-1
         γ = x[i]^2 + x[i+1]^2
         g[i] += 4.0γ*x[i] - 4.0
@@ -38,7 +40,7 @@ function ENGVAL1_g!(x, g)
     return g
 end
 
-function ENGVAL1_fg!(x, g)
+fg! = (g, x) -> begin
     fx = 0.0 
     for i in firstindex(x):lastindex(x)-1
         γ = x[i]^2 + x[i+1]^2
@@ -49,4 +51,11 @@ function ENGVAL1_fg!(x, g)
     return fx, g
 end
 
-TestSet["ENGVAL1"] = UncProgram("ENGVAL1", ENGVAL1_f, ENGVAL1_g!, ENGVAL1_fg!, 5000, 2.0*ones(5000))
+init = (n::Int=5000) -> begin
+	n < 2 && @warn("ENGVAL1: number of variables must be ≥ 2")
+	n = max(n, 2)
+    
+    return n, 2.0*ones(n)
+end
+
+TestSet["ENGVAL1"] = UncProgram("ENGVAL1",  f, g!, fg!, init)

@@ -15,7 +15,7 @@
 #
 # Daniel Henderson, 08/2021  
 
-function POWER_f(x) 
+f = (x) -> begin
     fx = 0.0
     for i in firstindex(x):lastindex(x)
         fx += x[i]^2*i
@@ -23,7 +23,7 @@ function POWER_f(x)
     return fx^2
 end
 
-function POWER_g!(x, g)
+g! = (g, x) -> begin
     α = 0.0
     for i in firstindex(x):lastindex(x)
         α += x[i]^2*i
@@ -34,7 +34,7 @@ function POWER_g!(x, g)
     return g
 end
 
-function POWER_fg!(x, g)
+fg! = (g, x) -> begin
     α = 0.0
     for i in firstindex(x):lastindex(x)
         α += x[i]^2*i
@@ -45,4 +45,8 @@ function POWER_fg!(x, g)
     return α^2, g
 end
 
-TestSet["POWER"] = UncProgram("POWER", POWER_f, POWER_g!, POWER_fg!, 10000, ones(10000))
+init = (n::Int=10000) -> begin
+    return n, ones(n)
+end
+
+TestSet["POWER"] = UncProgram("POWER", f, g!, fg!, init)

@@ -18,7 +18,7 @@
 #
 # Daniel Henderson, 08/2021
 
-function CURLY30_f(x)
+f = (x) -> begin
 	n = lastindex(x)
     q = similar(x)
 	fx = 0.0
@@ -29,7 +29,7 @@ function CURLY30_f(x)
     return fx
 end
 
-function CURLY30_g!(x, g)
+g! = (g, x) -> begin
 	n = lastindex(x)
     q = similar(x)
 	for i in 1:n
@@ -41,7 +41,7 @@ function CURLY30_g!(x, g)
     return g
 end
 
-function CURLY30_fg!(x, g)
+fg! = (g, x) -> begin
 	fx = 0.0
 	n = lastindex(x)
     q = similar(x)
@@ -55,5 +55,12 @@ function CURLY30_fg!(x, g)
     return fx, g
 end
 
-x0 = [0.0001*i/(10000 + 1) for i in 1:10000]
-TestSet["CURLY30"] = UncProgram("CURLY30", CURLY30_f, CURLY30_g!, CURLY30_fg!, 10000, x0)
+init = (n::Int=10000) -> begin
+	n < 2 && @warn("CURLY30: number of variables must be ≥ 2")
+	n = max(n, 2)
+	
+	x0 = [0.0001*i/(n + 1) for i in 1:n]
+    return n, x0
+end
+
+TestSet["CURLY30"] = UncProgram("CURLY30", f, g!, fg!, init)

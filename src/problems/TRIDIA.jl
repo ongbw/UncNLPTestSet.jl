@@ -17,7 +17,7 @@
 #
 #    Number of variables is variable
 
-function TRIDIA_f(x)
+f = (x) -> begin
 	fx   = (x[1]-1)^2
 	for i in firstindex(x)+1:lastindex(x)
 		item    = 2x[i]-x[i-1]
@@ -26,7 +26,7 @@ function TRIDIA_f(x)
     return fx
 end
 
-function TRIDIA_g!(x, g)
+g! = (g, x) -> begin
 	g[1] = 2(x[1]-1)
 	for i in firstindex(x)+1:lastindex(x)
 		item    = 2x[i]-x[i-1]
@@ -36,7 +36,7 @@ function TRIDIA_g!(x, g)
     return g
 end
 
-function TRIDIA_fg!(x, g)
+fg! = (g, x) -> begin
 	fx   = (x[1]-1)^2
 	g[1] = 2(x[1]-1)
 	for i in firstindex(x)+1:lastindex(x)
@@ -48,4 +48,8 @@ function TRIDIA_fg!(x, g)
     return fx, g
 end
 
-TestSet["TRIDIA"] = UncProgram("TRIDIA", TRIDIA_f, TRIDIA_g!, TRIDIA_fg!, 5000, ones(5000))
+init = (n::Int=5000) -> begin
+    return n, ones(n)
+end
+
+TestSet["TRIDIA"] = UncProgram("TRIDIA",f, g!, fg!, init)

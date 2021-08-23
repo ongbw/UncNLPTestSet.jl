@@ -16,7 +16,7 @@
 #
 #    Number of variables is variable
 
-function PENALTY1_f(x)
+f = (x) -> begin
 	a  = 1e-5
 	fx = tail = 0.0
 	for i in firstindex(x):lastindex(x)
@@ -28,7 +28,7 @@ function PENALTY1_f(x)
     return fx
 end
 
-function PENALTY1_g!(x, g)
+g! = (g, x) -> begin
 	a  = 1e-5
 	tail = 0.0
 	for i in firstindex(x):lastindex(x)
@@ -42,7 +42,7 @@ function PENALTY1_g!(x, g)
     return g
 end
 
-function PENALTY1_fg!(x, g)
+fg! = (g, x) -> begin
 	a  = 1e-5
 	tail = 0.0
 	for i in firstindex(x):lastindex(x)
@@ -58,5 +58,9 @@ function PENALTY1_fg!(x, g)
     return fx, g
 end
 
-@warn "PENALTY1 will break in adjdim!()"
-TestSet["PENALTY1"] = UncProgram("PENALTY1", PENALTY1_f, PENALTY1_g!, PENALTY1_fg!, 1000, Vector(1.0:1000.0))
+init = (n::Int=1000) -> begin
+	x0 = Vector(1.0:1.0:n)
+    return n, x0
+end
+
+TestSet["PENALTY1"] = UncProgram("PENALTY1", f, g!, fg!, init)

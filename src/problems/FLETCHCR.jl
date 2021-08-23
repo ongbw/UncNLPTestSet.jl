@@ -14,9 +14,7 @@
 #
 # Daniel Henderson, 08/2021
 
-# KNOWN ISSUES - SEE WHITEBOARD
-
-function FLETCHCR_f(x)
+f = (x) -> begin
     fx = 0.0
     for i in firstindex(x):lastindex(x)-1
         γ = x[i+1] - x[i] + 1 - x[i]^2
@@ -25,7 +23,7 @@ function FLETCHCR_f(x)
     return fx
 end
 
-function FLETCHCR_g!(x, g)
+g! = (g, x) -> begin
     for i in firstindex(x):lastindex(x)-1
         g[i] += 200*(1 + 2x[i])(-1+x[i]+x[i]^2-x[i+1])
         g[i+1] += 200*(1 - x[i] - x[i]^2 + x[i+1])
@@ -33,7 +31,7 @@ function FLETCHCR_g!(x, g)
     return g
 end
  
-function FLETCHCR_fg!(x, g)
+fg! = (g, x) -> begin
     fx = 0.0
     for i in firstindex(x):lastindex(x)-1
         γ = x[i+1] - x[i] + 1 - x[i]^2
@@ -44,4 +42,12 @@ function FLETCHCR_fg!(x, g)
     return fx, g
 end
 
-# TestSet["FLETCHCR"] = UncProgram("FLETCHCR", FLETCHCR_f, FLETCHCR_g!, FLETCHCR_fg!, 1000, zeros(1000))
+init = (n::Int=1000) -> begin
+	n < 2 && @warn("FLETCHCR: number of variables must be ≥ 2")
+	n = max(n, 2)
+    
+    return n, zeros(n)
+end
+
+@warn "TODO: FLETCHCR, determine starting iterate - see whiteboard"
+# TestSet["FLETCHCR"] = UncProgram("FLETCHCR", f, g!, fg!, init)

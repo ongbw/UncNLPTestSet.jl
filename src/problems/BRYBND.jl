@@ -13,7 +13,7 @@
 #
 #    Number of variables is variable
 
-function BRYBND_f(x)
+f = (x) -> begin
 	@warn "Does not agree with CUTEst.jl" 
 	mL = 5
 	mU = 1
@@ -37,7 +37,7 @@ function BRYBND_f(x)
     return fx
 end
 
-function BRYBND_g!(x, g)
+g = (g, x) -> begin
 	@warn "Does not agree with CUTEst.jl" 
 	mL = 5
 	mU = 1
@@ -68,7 +68,7 @@ function BRYBND_g!(x, g)
     return g
 end
 
-function BRYBND_fg!(x, g)
+fg! = (g, x) -> begin
     @warn "Does not agree with CUTEst.jl" 
 	mL = 5
 	mU = 1
@@ -100,4 +100,12 @@ function BRYBND_fg!(x, g)
     return fx, g
 end
 
-# TestSet["BRYBND"] = UncProgram("BRYBND", BRYBND_f, BRYBND_g!, BRYBND_fg!, 5000, ones(5000))
+init = (n::Int=5000) -> begin
+	n < 2 && @warn("BRYBND: number of variables must be ≥ 2")
+	n = max(n, 2)
+    
+    return n, -1.0*ones(n)
+end
+
+@warn "TODO: Issue in CUTEst? See https://github.com/JuliaSmoothOptimizers/OptimizationProblems.jl/blob/main/src/brybnd.jl"
+# TestSet["BRYBND"] = UncProgram("BRYBND", f, g!, fg!, init)

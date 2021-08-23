@@ -16,7 +16,7 @@
 #
 #    Number of variables is variable
 
-function ARWHEAD_f(x) 
+f = (x) -> begin
     fx = 0.0
     xn_sqr = x[lastindex(x)]^2
     for i in firstindex(x):lastindex(x)-1
@@ -25,7 +25,7 @@ function ARWHEAD_f(x)
     return fx
 end
 
-function ARWHEAD_g!(g, x)
+g! = (g, x) -> begin
     gn = 0.0
     cxn = 4.0*x[lastindex(x)]
     xn_sqr = cxn^2/16.0
@@ -38,7 +38,7 @@ function ARWHEAD_g!(g, x)
     return g
 end
 
-function ARWHEAD_fg!(g, x) 
+fg! = (g, x) -> begin
     gn = fx = 0.0
     cxn = 4.0*x[lastindex(x)]
     xn_sqr = cxn^2/16.0
@@ -52,4 +52,11 @@ function ARWHEAD_fg!(g, x)
     return fx, g
 end
 
-TestSet["ARWHEAD"] = UncProgram("ARWHEAD", ARWHEAD_f, ARWHEAD_g!, ARWHEAD_fg!, 5000, ones(5000))
+init = (n::Int=5000) -> begin
+	n < 2 && @warn("ARWHEAD: number of variables must be ≥ 2")
+	n = max(n, 2)
+    
+    return n, ones(n)
+end
+
+TestSet["ARWHEAD"] = UncProgram("ARWHEAD", f, g!, fg!, init)

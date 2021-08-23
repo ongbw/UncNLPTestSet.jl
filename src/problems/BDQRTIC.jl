@@ -16,7 +16,7 @@
 #
 #    Number of variables (variable)
 
-function BDQRTIC_f(x) 
+f = (x) -> begin
     fx = 0.0
     xn_sqr = x[lastindex(x)]^2
     for i in firstindex(x):lastindex(x)-4
@@ -27,7 +27,7 @@ function BDQRTIC_f(x)
     return fx
 end
 
-function BDQRTIC_g!(x, g)
+g! = (g, x) -> begin
     xn = x[lastindex(x)]
     cxn_sqr = 5.0xn^2
     gn = 0.0
@@ -44,7 +44,7 @@ function BDQRTIC_g!(x, g)
     return g
 end
 
-function BDQRTIC_fg!(x, g)
+fg! = (g, x) -> begin
     fx = 0.0 
     xn = x[lastindex(x)]
     cxn_sqr = xn^2
@@ -53,7 +53,7 @@ function BDQRTIC_fg!(x, g)
         α = 3.0 - 4.0x[i]
         γ = x[i]^2 + 2.0x[i+1]^2 + 3.0x[i+2]^2 + 4.0x[i+3]^2 + cxn_sqr
         fx += α*γ + γ^2
-        g[i] += -8.0α + 4.0γ*x[i];
+        g[i]   += -8.0α + 4.0γ*x[i];
         g[i+1] += 8.0γ*x[i+1];
         g[i+2] += 12.0γ*x[i+2];
         g[i+3] += 16.0γ*x[i+3];
@@ -63,4 +63,12 @@ function BDQRTIC_fg!(x, g)
     return fx, g
 end
 
-# TestSet["BDQRTIC"] = UncProgram("BDQRTIC", BDQRTIC_f, BDQRTIC_g!, BDQRTIC_fg!, 5000, ones(5000))
+init = (n::Int=5000) -> begin
+	n < 5 && @warn("BDQRTIC: number of variables must be ≥ 5")
+	n = max(n, 5)
+
+    return n, ones(n)
+end
+
+@warn "TODO: Debug BDQRTIC"
+#TestSet["BDQRTIC"] = UncProgram("BDQRTIC", f, g!, fg!, init)

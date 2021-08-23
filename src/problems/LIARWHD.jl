@@ -14,8 +14,10 @@
 #    LIARWHD.SIF classification  SUR2-AN-V-0
 #
 #    Number of variables (at least 2)
+#
+# Daniel Henderson, 08/2021
 
-function LIARWHD_f(x)  
+f = (x) -> begin
     fx = 0.0
     for i in firstindex(x):lastindex(x)
         α = 2.0(x[i]^2 - x[1])
@@ -25,7 +27,7 @@ function LIARWHD_f(x)
     return fx
 end
 
-function  LIARWHD_g!(x, g)
+g! = (g, x) -> begin
     for i in firstindex(x):lastindex(x)
         α = 2.0(x[i]^2 - x[1])
         γ = x[i]-1
@@ -35,7 +37,7 @@ function  LIARWHD_g!(x, g)
     return g
 end
 
-function LIARWHD_fg!(x, g)
+fg! = (g, x) -> begin
     fx = 0.0
     for i in firstindex(x):lastindex(x)
         α = 2.0(x[i]^2 - x[1])
@@ -47,4 +49,9 @@ function LIARWHD_fg!(x, g)
     return fx, g
 end
 
-TestSet["LIARWHD"] = UncProgram("LIARWHD", LIARWHD_f, LIARWHD_g!, LIARWHD_fg!, 5000, 4ones(5000))
+init = (n::Int=5000) -> begin
+	x0 = 4.0*ones(n)
+    return n, x0
+end
+
+TestSet["LIARWHD"] = UncProgram("LIARWHD", f, g!, fg!, init)

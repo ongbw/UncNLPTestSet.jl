@@ -16,8 +16,10 @@
 #    EXTROSNB.SIF classification  SUR2-AN-V-0
 #
 #    Number of variables (at least 2)
+#
+# Daniel Henderson, 08/2021
 
-function EXTROSNB_f(x)  
+f = (x) -> begin
     α = x[1] - 1.0
     fx = α^2
     for i in firstindex(x)+1:lastindex(x)
@@ -28,7 +30,7 @@ function EXTROSNB_f(x)
 end
 
 
-function EXTROSNB_g!(x, g)
+g! = (g, x) -> begin
     α = x[1] - 1.0
     g[1] = 2α
     for i in firstindex(x)+1:lastindex(x)
@@ -40,7 +42,7 @@ function EXTROSNB_g!(x, g)
 end
 
 
-function EXTROSNB_fg!(x, g)
+fg! = (g, x) -> begin
     α = x[1] - 1.0
     fx = α^2
     g[1] = 2α
@@ -53,4 +55,11 @@ function EXTROSNB_fg!(x, g)
     return fx, g
 end
 
-TestSet["EXTROSNB"] = UncProgram("EXTROSNB", EXTROSNB_f, EXTROSNB_g!, EXTROSNB_fg!, 1000, -1.0ones(1000))
+init = (n::Int=1000) -> begin
+	n < 2 && @warn("EXTROSNB: number of variables must be ≥ 2")
+	n = max(n, 2)
+    
+    return n, -1.0*ones(n)
+end
+
+TestSet["EXTROSNB"] = UncProgram("EXTROSNB",  f, g!, fg!, init)

@@ -159,6 +159,6 @@ for p in readdir(joinpath(@__DIR__, "problems"))
 end
 
 
-export obj, grad, obj_grad, TestSet, adjdim!, hessAD, programs, select_program
+export obj, grad, objgrad, TestSet, adjdim!, hessAD, programs, select_program
 
 end # module UncNLPTestSet

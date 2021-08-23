@@ -1,6 +1,6 @@
 #    Problem :
 #    *********
-#    The Dixon-Maany test problem (version E)
+#    The Dixon-Maany test problem (version N)
 #
 #    Origonal SIF Source:
 #    L.C.W. Dixon and Z. Maany,
@@ -10,22 +10,28 @@
 #
 # 	 See also Buckley#221 (p. 49)
 #
-#    DIXMAANE.SIF classification OUR2-AN-V-0
+#    L. Luksan, C. Matonoha and J. Vlcek
+#    Modified CUTE problems for sparse unconstrained optimization,
+#    Technical Report 1081,
+#    Institute of Computer Science,
+#    Academy of Science of the Czech Republic
+#
+#    DIXMAANN.SIF classification OUR2-AN-V-0
 #
 #    m is equal to the third of the number of variables (n is divisible by 3)
 #
 # Daniel Henderson, 08/2021
 
-function DIXMAANE_f(x)
+function DIXMAANN_f(x)
 	n = lastindex(x)
 	m = Int(n/3)
 	fx = 1.0
 
 	α = 1.0
-	Β = 0.0
-	γ = 0.125
-	δ = 0.125
-	E = [1, 0, 0, 1]
+	Β = 0.0625
+	γ = 0.0625
+	δ = 0.0625
+	E = [2, 1, 1, 2]
 	
 	fx += sum(α*x[i]^2*(i/n)^E[1] for i in 1:n)							# S1
 	fx += sum(Β*x[i]^2*(x[i+1]+x[i+1]^2)^2*(i/n)^E[2] for i in 1:n-1)   # S2
@@ -34,15 +40,15 @@ function DIXMAANE_f(x)
     return fx
 end
 
-function DIXMAANE_g!(x, g)
+function DIXMAANN_g!(x, g)
 	n = lastindex(x)
 	m = Int(n/3)
 
 	α = 1.0
-	Β = 0.0
-	γ = 0.125
-	δ = 0.125
-	E = [1, 0, 0, 1]
+	Β = 0.0625
+	γ = 0.0625
+	δ = 0.0625
+	E = [2, 1, 1, 2]
 
 	# S1 := ∑ α*x[i]^2*(i/n)^E[1] for i in 1:n
 	for i in 1:n
@@ -69,16 +75,16 @@ function DIXMAANE_g!(x, g)
 	return g
 end
 
-function DIXMAANE_fg!(x, g)
+function DIXMAANN_fg!(x, g)
 	n = lastindex(x)
 	m = Int(n/3)
 	fx = 1.0
 
 	α = 1.0
-	Β = 0.0
-	γ = 0.125
-	δ = 0.125
-	E = [1, 0, 0, 1]
+	Β = 0.0625
+	γ = 0.0625
+	δ = 0.0625
+	E = [2, 1, 1, 2]
 
 	# S1 := ∑ α*x[i]^2*(i/n)^E[1] for i in 1:n
 	for i in 1:n
@@ -109,4 +115,4 @@ function DIXMAANE_fg!(x, g)
 	return fx, g
 end
 
-TestSet["DIXMAANE"] = UncProgram("DIXMAANE", DIXMAANE_f, DIXMAANE_g!, DIXMAANE_fg!, 3000, 2ones(3000))
+TestSet["DIXMAANN"] = UncProgram("DIXMAANN", DIXMAANN_f, DIXMAANN_g!, DIXMAANN_fg!, 3000, 2ones(3000))

@@ -55,7 +55,5 @@ function CURLY20_fg!(x, g)
     return fx, g
 end
 
-@warn "CURLY20 will break in adjdim!() and n≥2 must hold"
-
 x0 = [0.0001*i/(10000 + 1) for i in 1:10000]
 TestSet["CURLY20"] = UncProgram("CURLY20", CURLY20_f, CURLY20_g!, CURLY20_fg!, 10000, x0)

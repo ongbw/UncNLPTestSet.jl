@@ -1,7 +1,7 @@
 
 # UncNLPTestSet.jl
 A testing set for unconstrained non-linear programming problems.  
-The testing set consists of a subset of thelarge-unconstrained problems found in the CUTE, _the Constrained and Unconstrained Testing Enviroment_.   
+The testing set consists of a subset of the large-unconstrained problems found in CUTE, _the Constrained and Unconstrained Testing Enviroment_.   
 
 ### Under Development
 The testing set is currently under development and a user will be exposed to unstable functionality in the main UncNLPTestSet module. However, care has been tacken updating this repository to ensure that unstable features throw appropriate errors, or warnings.  
@@ -38,7 +38,10 @@ for nlp in Values(TestSet)
     grad(nlp, nlp.x0)
 
     # evaluate the objective and gradient at x0 over one iteration of the programs dimensions
-    obj_grad(nlp, nlp.x0)
+    objgrad(nlp, nlp.x0)
+    
+    # # evaluate the hessian at x0 by Foward Automatic Differentiation computation
+    hessAD(nlp, nlp.x0)
 end
 ```
 

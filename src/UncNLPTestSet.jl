@@ -3,7 +3,8 @@
 #   - use the function dump() to show internals
 
 module UncNLPTestSet
-using LinearAlgebra, ForwardDiff, Printf
+using LinearAlgebra, Printf
+using ForwardDiff
 
 # utility
 macro lencheck(l, vars...)
@@ -31,7 +32,8 @@ mutable struct UncProgram
     g!::Function
     fg!::Function
     init::Function
-    # initlized feilds 
+
+    # init feilds 
     n::Integer
     x0::Vector{T} where T<:Real
 
@@ -43,7 +45,7 @@ end
 
 
 """
-    TestSet
+    UncNLPTestSet.TestSet
 
 A dictionary mapping the problem name it's corresponding UncProgram.
 The dictionary is the users interface to problems contained in UncNLPTestSet.jl
@@ -81,7 +83,7 @@ end
 
 
 """
-    obj_grad
+    objgrad
 
 ```math
 f(x), ∇f(x)
@@ -95,13 +97,14 @@ function objgrad(nlp::UncProgram, x::Vector{<:Real})
     return nlp.fg!(x, g)
 end
 
+
 """
     hessAD
 
 ```math
 ∇^2f(\boldmath{x})
 ```
-Determines the Hessian matrix of an objective function at the point x,
+Determines the full Hessian matrix of an objective function at the point x,
 by means of an Automatic Differentiation of the nlp's gradient formula. 
 """
 function hessAD(nlp::UncProgram, x::Vector{<:Real}) 
@@ -109,6 +112,27 @@ function hessAD(nlp::UncProgram, x::Vector{<:Real})
     g = zeros(length(x))
     return ForwardDiff.jacobian(nlp.g!, g, x)
 end
+
+
+"""
+function gAD()
+
+    # TODO: this is ridiculous implementation
+"""
+function gAD!(nlp::UncProgram, x::Vector{<:Real}, S::Matrix{<})
+    @lencheck nlp.n size(S, 1)
+    dual = ForwardDiff.Dual{1}.(x,  eachcol(S)...)
+    result = ForwardDiff.Dual{1}.(zeros(nlp.n),  eachcol(S)...) 
+	nlp.g!(result, dual)
+    g = similar(x)
+    Y = similar(S)
+    for i in 1:nlp.n
+        Y[i, :] = result[i].partials[:]
+        g[i] = result[i].values
+    end
+    return g, S
+end
+
 
 """
     adjdim!
@@ -125,6 +149,7 @@ function adjdim!(nlp::UncProgram, n::Number=0)
     nlp.x0 = x0
 end
 
+
 """
     Programs
 
@@ -133,21 +158,22 @@ f(x), ∇f(x)
 ```
 A list of unconstrained nonlinear programming problems in the current testing enviroment. 
 """
-function programs()
+function Programs()
     for nlp in values(TestSet)
         @printf "%s with dimension %d\n" nlp.name nlp.n
     end
 end
 
+
 """
-    Select
+    select
 
 ```math
 f(x), ∇f(x)
 ```
 Returns an instance of UncProgram. 
 """
-function select_program(key::String)
+function SelectProgram(key::String)
     if key ∈ keys(TestSet)
         return TestSet[key]
     end
@@ -159,6 +185,8 @@ for p in readdir(joinpath(@__DIR__, "problems"))
 end
 
 
-export obj, grad, objgrad, TestSet, adjdim!, hessAD, programs, select_program
+
+
+export obj, grad, objgrad, adjdim!, hessAD, Programs, SelectProgram
 
 end # module UncNLPTestSet

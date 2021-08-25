@@ -102,10 +102,11 @@ end
     hessAD
 
 ```math
-∇^2f(\boldmath{x})
+∇²f(x)
 ```
 Determines the full Hessian matrix of an objective function at the point x,
-by means of an Automatic Differentiation of the nlp's gradient formula. 
+by computing the Jacobian the gradient formula. The Jacobian is computed by
+a forward automatic differentation from ForwardDiff.jl. 
 """
 function hessAD(nlp::UncProgram, x::Vector{<:Real}) 
     @lencheck nlp.n x
@@ -115,9 +116,9 @@ end
 
 
 """
-function gAD()
+function gAD!()
 
-    # TODO: Consider passing Y
+    # TODO: Consider passing Y. For future copy&paste: ℜⁿˣⁿ
 """
 function gAD!(nlp, x::Vector{<:Real}, S::Matrix{<:Real}, g::Union{Vector{<:Real}, Nothing}=nothing)
 	S_dual = ForwardDiff.Dual{:tag}.(x,  eachcol(S)...)
@@ -143,6 +144,35 @@ function gAD!(nlp, x::Vector{<:Real}, S::Matrix{<:Real}, g::Union{Vector{<:Real}
 end
 
 """
+    bfgs
+
+```math
+∇²f(x)
+```
+A variant of the Broyden-Fletcher-Goldfard-Shanno inverse Quasi-Newton update extended
+to n-directions, such that the multi-secant equations are satisfied.
+
+blah blah blah, list argument requitements here.
+"""
+function bfgs(H::Matrix{<:Real}, U::Matrix{<:Real}, V::Matrix{<:Real}, ϵ::Float64)
+	 # requirement, and yeilds a differinent computation on pinv
+	UTVᵀ = U*pinv(U'V, ϵ)*V'
+	E = I - UTVᵀ
+	return UTVᵀ + E*H*E
+end
+
+
+"""
+    orth_proj
+
+Orthoganalizes the space spanned by U with respect to the basis of V
+"""
+function orth_proj(U::Matrix{<:Real}, V::Matrix{<:Real})
+	return V - U*(U'*V)
+end
+
+
+"""
 function gAD()
 
     # bDim corresponds to the number of processors available
@@ -158,16 +188,18 @@ function gHS(nlp, x, S, bDim::Int)
     
     # we determine g on the first iteration
     g = similar(x)
-    Y = gAD!(nlp, x, S[:, 1:(m-1)], g)
+    Y = gAD!(nlp, x, S[:, 1:(m)], g)
+    #println("Y after first itr: columnns ", size(Y,2), " rows ", size(Y, 1))  
 
     # overwrite the last column of S to contain g
-    S[:, nlp.n] = g
+    S[:, nlp.n] = g # make this an appending operation? -> S ∈ ℜⁿˣ\^{n-1} 
 
-    for i in m:bDim:(nlp.n-bDim) 
-        Yi = gAD!(nlp, x, S[:, i:(i+bDim)])
-        Y = [Y Yi] #best way to do this? 
+    for i in m+1:bDim:nlp.n 
+        Yi = gAD!(nlp, x, S[:, i:(i+bDim-1)])
+        Y = [Y Yi] # best way to do this? 
+        #println("Y after ", (i - m)/bDim, " itr: columnns ", size(Y,2), " rows ", size(Y, 1)) 
     end
-    return g, Y
+    return Y # actually it is V ... appending ∇f in S and ∇²f in Y, so S is really U
 end
 
 """
@@ -179,7 +211,7 @@ f(x), ∇f(x)
 Change the dimensions of a specified problem in the TestSet
 """
 function adjdim!(nlp::UncProgram, n::Number=0)
-    @warn "This operation may be unstable"
+    @warn "adjdim!: This operation may be unstable"
     n, x0 = nlp.init(n)
     nlp.n = n
     nlp.x0 = x0

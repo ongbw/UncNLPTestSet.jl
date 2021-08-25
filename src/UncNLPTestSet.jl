@@ -120,9 +120,9 @@ function gAD()
     # TODO: Consider passing Y
 """
 function gAD!(nlp, x::Vector{<:Real}, S::Matrix{<:Real}, g::Union{Vector{<:Real}, Nothing}=nothing)
-	S_dual = ForwardDiff.Dual{1}.(x,  eachcol(S)...)
+	S_dual = ForwardDiff.Dual{:tag}.(x,  eachcol(S)...)
 	# Y_dual = isa(g, Nothing) ? similar(S_dual) : ForwardDiff.Dual{1}.(zeros(nlp.n),  eachcol(S)...) 
-	Y_dual = ForwardDiff.Dual{1}.(zeros(nlp.n),  eachcol(S)...) 
+	Y_dual = ForwardDiff.Dual{:tag}.(zeros(nlp.n),  eachcol(S)...) 
 	# ... when removing g+= statements, we can have Y_dual = similar(S_dual)
 
 	nlp.g!(Y_dual, S_dual)
@@ -146,11 +146,11 @@ end
 function gAD()
 
     # bDim corresponds to the number of processors available
-    # TODO: we are making the assumption that mod(bDim, nlp.n) ≠ 0
-    # TODO: use @view macro when passing S and Y to gAD? should be inplace... 
+    # TODO: we are making the assumption that mod(bDim, nlp.n) ≠ 0, BAD
+    # TODO: this should be inplace... 
 """
 function gHS(nlp, x, S, bDim::Int)
-    nlp.n < bDim && @warn("Block size $bDim ≥ $(nlp.n)/2, the problems dimension")
+    nlp.n < bDim && @warn("Block size $bDim ≥ $(nlp.n), the problems dimension")
     bDim = Int(min(nlp.n/2, bDim)) # ensures 2 iterations of gAD to get J(∇f(x))
 
     # determine the first set of m-1 directions

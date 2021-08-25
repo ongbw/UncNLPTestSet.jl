@@ -117,22 +117,58 @@ end
 """
 function gAD()
 
-    # TODO: this is ridiculous implementation
+    # TODO: Consider passing Y
 """
-function gAD!(nlp::UncProgram, x::Vector{<:Real}, S::Matrix{<})
-    @lencheck nlp.n size(S, 1)
-    dual = ForwardDiff.Dual{1}.(x,  eachcol(S)...)
-    result = ForwardDiff.Dual{1}.(zeros(nlp.n),  eachcol(S)...) 
-	nlp.g!(result, dual)
-    g = similar(x)
-    Y = similar(S)
-    for i in 1:nlp.n
-        Y[i, :] = result[i].partials[:]
-        g[i] = result[i].values
+function gAD!(nlp, x::Vector{<:Real}, S::Matrix{<:Real}, g::Union{Vector{<:Real}, Nothing}=nothing)
+	S_dual = ForwardDiff.Dual{1}.(x,  eachcol(S)...)
+	# Y_dual = isa(g, Nothing) ? similar(S_dual) : ForwardDiff.Dual{1}.(zeros(nlp.n),  eachcol(S)...) 
+	Y_dual = ForwardDiff.Dual{1}.(zeros(nlp.n),  eachcol(S)...) 
+	# ... when removing g+= statements, we can have Y_dual = similar(S_dual)
+
+	nlp.g!(Y_dual, S_dual)
+
+	Yi = similar(S)
+	# update forwardDiff to make extraction more economical
+    @views for i in 1:nlp.n
+        Yi[i, :] .= Y_dual[i].partials[:]
     end
-    return g, S
+
+	if !isa(g, Nothing)
+		# Also this should be more economical
+		for i in 1:nlp.n
+			g[i] = Y_dual[i].value
+		end
+	end
+	return Yi
 end
 
+"""
+function gAD()
+
+    # bDim corresponds to the number of processors available
+    # TODO: we are making the assumption that mod(bDim, nlp.n) ≠ 0
+    # TODO: use @view macro when passing S and Y to gAD? should be inplace... 
+"""
+function gHS(nlp, x, S, bDim::Int)
+    nlp.n < bDim && @warn("Block size $bDim ≥ $(nlp.n)/2, the problems dimension")
+    bDim = Int(min(nlp.n/2, bDim)) # ensures 2 iterations of gAD to get J(∇f(x))
+
+    # determine the first set of m-1 directions
+    m = Int(mod(nlp.n, bDim))
+    
+    # we determine g on the first iteration
+    g = similar(x)
+    Y = gAD!(nlp, x, S[:, 1:(m-1)], g)
+
+    # overwrite the last column of S to contain g
+    S[:, nlp.n] = g
+
+    for i in m:bDim:(nlp.n-bDim) 
+        Yi = gAD!(nlp, x, S[:, i:(i+bDim)])
+        Y = [Y Yi] #best way to do this? 
+    end
+    return g, Y
+end
 
 """
     adjdim!
@@ -166,7 +202,7 @@ end
 
 
 """
-    select
+    SelectProgram
 
 ```math
 f(x), ∇f(x)
@@ -187,6 +223,6 @@ end
 
 
 
-export obj, grad, objgrad, adjdim!, hessAD, Programs, SelectProgram
+export obj, grad, objgrad, adjdim!, hessAD, Programs, SelectProgram, gHS
 
 end # module UncNLPTestSet

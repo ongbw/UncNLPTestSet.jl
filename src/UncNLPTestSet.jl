@@ -220,9 +220,9 @@ to n-directions, such that the multi-secant equations are satisfied.
 blah blah blah, list argument requitements here.
 """
 function BFGS(H::Matrix{<:Real}, U::Matrix{<:Real}, V::Matrix{<:Real}, ϵ::Float64)
-    UlessHV = U-HV
-	T = pinv(Symmetric(UlessHV'V), ϵ)
-	return H + UlessHV*T*UlessHV'
+    UTVᵀ = U*pinv(U'V, ϵ)*V'
+	E = I - UTVᵀ
+	return UTVᵀ + E*H*E
 end
 
 
@@ -238,9 +238,9 @@ to n-directions and producing an update of rank b.
 blah blah blah, list argument requitements here.
 """
 function SR1(H::Matrix{<:Real}, U::Matrix{<:Real}, V::Matrix{<:Real}, ϵ::Float64)
-	UTVᵀ = U*pinv(Symmetric(U'V), ϵ)*V'
-	E = I - UTVᵀ
-	return UTVᵀ + E*H*E
+    UlessHV = U-H*V
+	T = pinv(Symmetric(UlessHV'V), ϵ)
+	return H + UlessHV*T*UlessHV'
 end
 
 
@@ -260,6 +260,6 @@ end
 
 
 
-export obj, grad, objgrad, adjdim!, hessAD, Programs, SelectProgram, gHS
+export obj, grad, objgrad, adjdim!, hessAD, Programs, SelectProgram, gHS, BFGS, orth
 
 end # module UncNLPTestSet

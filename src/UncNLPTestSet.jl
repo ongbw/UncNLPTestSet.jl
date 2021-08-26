@@ -209,7 +209,7 @@ end
 
 
 """
-    bfgs
+    BFGS
 
 ```math
 ∇²f(x)
@@ -219,8 +219,8 @@ to n-directions, such that the multi-secant equations are satisfied.
 
 blah blah blah, list argument requitements here.
 """
-function BFGS(H::Matrix{<:Real}, U::Matrix{<:Real}, V::Matrix{<:Real}, ϵ::Float64)
-    UTVᵀ = U*pinv(U'V, ϵ)*V'
+function BFGS(H::Symmetric{<:Real}, U::Matrix{<:Real}, V::Matrix{<:Real}, ϵ::Float64)
+    UTVᵀ = U*pinv(U'*V, ϵ)*V'
 	E = I - UTVᵀ
 	return UTVᵀ + E*H*E
 end
@@ -252,7 +252,6 @@ Orthoganalizes the space spanned by U with respect to the basis of V
 function orth(S::Matrix{<:Real})
 	return Matrix(qr(S).Q)
 end
-
 
 
 

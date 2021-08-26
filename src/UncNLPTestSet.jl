@@ -5,6 +5,7 @@
 module UncNLPTestSet
 using LinearAlgebra, Printf
 using ForwardDiff
+using NLPModels
 
 # utility
 macro lencheck(l, vars...)
@@ -25,6 +26,8 @@ end
     UncProgram
 
 A base parent type of each unconstrained non-linear program
+TODO: Make this guy extend AbstractNLPModels where I hold a self
+reference to constunct. 
 """
 mutable struct UncProgram
     name::String
@@ -33,9 +36,12 @@ mutable struct UncProgram
     fg!::Function
     init::Function
 
-    # init feilds 
+    # # init feilds
+    # meta::NLPModelMeta{T,S}
+    # counters::Counters
+
     n::Integer
-    x0::Vector{T} where T<:Real
+    x0::Vector
 
     function UncProgram(name, f, g!, fg!, init)
         n, x0 = init()
@@ -182,6 +188,7 @@ function gAD(nlp::UncProgram, x::Vector{<:Real}, S::Matrix{<:Real})
     # extract dual 
     Y = similar(S)
     g = similar(x)
+    # TODO: use copyto! here 
     @views for i in 1:length(x)
         Y[i, :] .= Ydual[i].partials[:]
         g[i]     = Ydual[i].value

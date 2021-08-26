@@ -116,93 +116,6 @@ end
 
 
 """
-function gAD!()
-
-    # TODO: Consider passing Y. For future copy&paste: ℜⁿˣⁿ
-"""
-function gAD!(nlp, x::Vector{<:Real}, S::Matrix{<:Real}, g::Union{Vector{<:Real}, Nothing}=nothing)
-	S_dual = ForwardDiff.Dual{:tag}.(x,  eachcol(S)...)
-	# Y_dual = isa(g, Nothing) ? similar(S_dual) : ForwardDiff.Dual{1}.(zeros(nlp.n),  eachcol(S)...) 
-	Y_dual = ForwardDiff.Dual{:tag}.(zeros(nlp.n),  eachcol(S)...) 
-	# ... when removing g+= statements, we can have Y_dual = similar(S_dual)
-
-	nlp.g!(Y_dual, S_dual)
-
-	Yi = similar(S)
-	# update forwardDiff to make extraction more economical
-    @views for i in 1:nlp.n
-        Yi[i, :] .= Y_dual[i].partials[:]
-    end
-
-	if !isa(g, Nothing)
-		# Also this should be more economical
-		for i in 1:nlp.n
-			g[i] = Y_dual[i].value
-		end
-	end
-	return Yi
-end
-
-"""
-    bfgs
-
-```math
-∇²f(x)
-```
-A variant of the Broyden-Fletcher-Goldfard-Shanno inverse Quasi-Newton update extended
-to n-directions, such that the multi-secant equations are satisfied.
-
-blah blah blah, list argument requitements here.
-"""
-function bfgs(H::Matrix{<:Real}, U::Matrix{<:Real}, V::Matrix{<:Real}, ϵ::Float64)
-	 # requirement, and yeilds a differinent computation on pinv
-	UTVᵀ = U*pinv(U'V, ϵ)*V'
-	E = I - UTVᵀ
-	return UTVᵀ + E*H*E
-end
-
-
-"""
-    orth_proj
-
-Orthoganalizes the space spanned by U with respect to the basis of V
-"""
-function orth_proj(U::Matrix{<:Real}, V::Matrix{<:Real})
-	return V - U*(U'*V)
-end
-
-
-"""
-function gAD()
-
-    # bDim corresponds to the number of processors available
-    # TODO: we are making the assumption that mod(bDim, nlp.n) ≠ 0, BAD
-    # TODO: this should be inplace... 
-"""
-function gHS(nlp, x, S, bDim::Int)
-    nlp.n < bDim && @warn("Block size $bDim ≥ $(nlp.n), the problems dimension")
-    bDim = Int(min(nlp.n/2, bDim)) # ensures 2 iterations of gAD to get J(∇f(x))
-
-    # determine the first set of m-1 directions
-    m = Int(mod(nlp.n, bDim))
-    
-    # we determine g on the first iteration
-    g = similar(x)
-    Y = gAD!(nlp, x, S[:, 1:(m)], g)
-    #println("Y after first itr: columnns ", size(Y,2), " rows ", size(Y, 1))  
-
-    # overwrite the last column of S to contain g
-    S[:, nlp.n] = g # make this an appending operation? -> S ∈ ℜⁿˣ\^{n-1} 
-
-    for i in m+1:bDim:nlp.n 
-        Yi = gAD!(nlp, x, S[:, i:(i+bDim-1)])
-        Y = [Y Yi] # best way to do this? 
-        #println("Y after ", (i - m)/bDim, " itr: columnns ", size(Y,2), " rows ", size(Y, 1)) 
-    end
-    return Y # actually it is V ... appending ∇f in S and ∇²f in Y, so S is really U
-end
-
-"""
     adjdim!
 
 ```math
@@ -251,6 +164,98 @@ end
 for p in readdir(joinpath(@__DIR__, "problems"))
     include(joinpath("problems", p))
 end
+
+
+""" ----------- Start of solver routines ---------- """
+
+
+"""
+function gAD()
+
+A subroutine of Algorithm 4.1, as implemented in the paper
+"""
+function gAD(nlp::UncProgram, x::Vector{<:Real}, S::Matrix{<:Real})
+	Sdual = ForwardDiff.Dual{1}.(x,  eachcol(S)...)
+	Ydual = ForwardDiff.Dual{1}.(zeros(nlp.n),  eachcol(S)...)
+	nlp.g!(Ydual, Sdual)
+    
+    # extract dual 
+    Y = similar(S)
+    g = similar(x)
+    @views for i in 1:length(x)
+        Y[i, :] .= Ydual[i].partials[:]
+        g[i]     = Ydual[i].value
+    end
+
+	return g, Y
+end
+
+
+"""
+function gHS()
+
+Algorithm 4.2
+"""
+function gHS(nlp::UncProgram, x::Vector{<:Real}, S::Matrix)
+    b = Int((1+size(S,2))/2)
+    g, Y₁ = gAD(nlp, x, S[:, 1:b])
+    _, Y₂ = gAD(nlp, x, [S[:,(b+1):(2b-1)] g])
+
+    Y = [Y₁ Y₂[:, 1:b-1]]
+    h = Y₂[:, size(Y₂, 2)]
+    return g, h, Y
+end
+
+
+
+"""
+    bfgs
+
+```math
+∇²f(x)
+```
+A variant of the Broyden-Fletcher-Goldfard-Shanno inverse Quasi-Newton update extended
+to n-directions, such that the multi-secant equations are satisfied.
+
+blah blah blah, list argument requitements here.
+"""
+function BFGS(H::Matrix{<:Real}, U::Matrix{<:Real}, V::Matrix{<:Real}, ϵ::Float64)
+    UlessHV = U-HV
+	T = pinv(Symmetric(UlessHV'V), ϵ)
+	return H + UlessHV*T*UlessHV'
+end
+
+
+"""
+    SR1
+
+```math
+∇²f(x)
+```
+A variant of SR1, a rank-1 Broyed-class Quasi-Newton update extended,
+to n-directions and producing an update of rank b.
+
+blah blah blah, list argument requitements here.
+"""
+function SR1(H::Matrix{<:Real}, U::Matrix{<:Real}, V::Matrix{<:Real}, ϵ::Float64)
+	UTVᵀ = U*pinv(Symmetric(U'V), ϵ)*V'
+	E = I - UTVᵀ
+	return UTVᵀ + E*H*E
+end
+
+
+"""
+    orth
+
+Orthoganalizes the space spanned by U with respect to the basis of V
+"""
+function orth(S::Matrix{<:Real})
+	return Matrix(qr(S).Q)
+end
+
+
+
+
 
 
 

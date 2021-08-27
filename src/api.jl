@@ -5,8 +5,19 @@ Defines the interface to each problem in the UncNLPTestSet.
 The interface should feel familiar to interacting with NLPModels.jl,
 apart of the JuliaSmoothOptimizers orginization.
 """
-using LinearAlgebra, Printf
-using ForwardDiff
+
+macro lencheck(l, vars...)
+    exprs = Expr[]
+    for var in vars
+      varname = string(var)
+      push!(exprs, :(
+        if length($(esc(var))) != $(esc(l))
+          throw(DimensionError($varname, $(esc(l)), length($(esc(var)))))
+        end
+      ))
+    end
+    Expr(:block, exprs...)
+  end
 
 """
     obj

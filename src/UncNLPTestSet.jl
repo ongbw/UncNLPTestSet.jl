@@ -25,6 +25,8 @@ testing set for a AD based quasi-newton scheme. See qntrhs.jl
 """
 module UncNLPTestSet
 
+using LinearAlgebra, Printf, ForwardDiff
+
 """
     UncProgram
 
@@ -44,6 +46,8 @@ mutable struct UncProgram
     end 
 end
 
+include("api.jl")
+include("qntrhs.jl")
 
 """
     UncNLPTestSet.TestSet
@@ -55,8 +59,7 @@ for p in readdir(joinpath(@__DIR__, "programs"))
     include(joinpath("programs", p))
 end
 
-include("api.jl")
-include("qntrhs.jl")
+
 
 export obj, grad, objgrad, adjdim!, hessAD, Programs, SelectProgram, gHS, BFGS, SR1, orth
 

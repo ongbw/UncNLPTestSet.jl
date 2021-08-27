@@ -4,10 +4,7 @@ A testing set for unconstrained non-linear programming problems.
 The testing set consists of a subset of the large-unconstrained problems found in CUTE, _the Constrained and Unconstrained Testing Enviroment_.   
 
 ### Under Development
-The testing set is currently under development and a user will be exposed to unstable functionality in the main UncNLPTestSet module. However, care has been tacken updating this repository to ensure that unstable features throw appropriate errors, or warnings.  
-
-Once a test program passes adequite testing, it becomes part of the `TestSet`, an exposed dictonary mapping the CUTE problem name to a `UncProgram` instance.
-Each problem is named in accordance to their respective .SIF file, where the CUTE problems where origonally encoded.
+The testing set is currently under development and a user will be exposed to unstable functionality in the main UncNLPTestSet module. However, care has been tacken updating this repository to ensure that unstable features throw appropriate errors, or warnings. 
 
 ### Installation
 ```julia
@@ -16,7 +13,7 @@ julia> Pkg.add(url="https://github.com/danphenderson/UncNLPTestSet.jl")
 julia> using UncNLPTestSet.jl
 ```
 
-Until a stable version has been released, when ```julia using UncNLPTestSet``` it is best to first update your version of the package:
+<!-- Until a stable version has been released, when ```julia using UncNLPTestSet``` it is best to first update your version of the package:
 
 ```julia
 julia> Pkg.update("UncNLPTestSet.jl")
@@ -43,5 +40,5 @@ for nlp in Values(TestSet)
     # # evaluate the hessian at x0 by Foward Automatic Differentiation computation
     hessAD(nlp, nlp.x0)
 end
-```
+``` -->
 
